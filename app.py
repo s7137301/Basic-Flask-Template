@@ -3,7 +3,8 @@ import sys, os
 import logging
 from interfaces.databaseinterface import Database
 from interfaces.hashing import *
-from werkzeug.utils import secure_filename
+from werkzeug.utils import secure_filename    
+
 
 #---CONFIGURE APP---------------------------------------------------
 app = Flask(__name__)
