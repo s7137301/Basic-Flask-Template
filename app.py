@@ -61,6 +61,15 @@ def home():
     app.logger.info("Home")
     return render_template("home.html")
 
+@app.route('/products')
+def products_for_rent():
+
+    if 'userid' not in session:
+        return redirect('./')
+
+    app.logger.info("Products for rent")
+    return render_template("products.html")
+
 @app.route('/', methods=["GET","POST"])
 def login():
     app.logger.info("Login")

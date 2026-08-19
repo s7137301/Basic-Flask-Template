@@ -1,0 +1,8 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h2>Home</h2>
+    <p>{{session}}</p>
+    <p>Welcome {{session['name']}}</p>
+    {% include "profilephoto.html" %}
+
+{% endblock %}
