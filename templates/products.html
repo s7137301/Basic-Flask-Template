@@ -14,6 +14,7 @@
                 <div class="card h-100 shadow-sm">
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title">{{ listing['title'] }}</h5>
+                        {% if listing['absorb_failovers'] == 1 %}<span class="status-badge status-available mb-2">SLA Failover Node</span>{% endif %}
                         <p class="card-text mb-1"><strong>Type:</strong> {{ listing['hardware_type'] }}</p>
                         <p class="card-text mb-1"><strong>RAM:</strong> {{ listing['ram_gb'] }} GB</p>
                         <p class="card-text mb-3"><strong>Seller:</strong> {{ listing['firstname'] }}</p>
@@ -44,7 +45,7 @@
                 <label for="actual_completed_hours" class="form-label">Completed hours</label>
                 <input type="number" class="form-control" id="actual_completed_hours" name="actual_completed_hours" min="0" max="{{ active_agreement['hours'] }}" value="0" required>
             </div>
-            <div class="col-auto"><button type="submit" class="btn btn-warning">Simulate node disconnect</button></div>
+            <div class="col-auto"><button type="submit" class="btn btn-warning">Simulate Mid-Job Disconnect</button></div>
         </form>
         <pre id="failover-output" class="mt-3 p-3 bg-light">No failover simulated.</pre>
     </section>
@@ -66,7 +67,7 @@
             event.preventDefault();
             new_ajax_helper('/api/simulate-failover', function (results) {
                 document.getElementById('failover-output').textContent = results.status === 'success'
-                    ? 'Failover complete. Remaining hours: ' + results.remaining_hours + '. Penalty: $' + results.penalty_fee.toFixed(2)
+                    ? 'Failover complete. Remaining hours absorbed by backup node: ' + results.remaining_hours + '. Penalty charged to original seller: $' + results.penalty_fee.toFixed(2)
                     : results.message;
             }, new FormData(failoverForm), 'POST');
         });

@@ -10,6 +10,20 @@
     max-width: 680px;
 }
 
+.info-badge {
+    align-items: center;
+    background-color: #6f42c1;
+    border-radius: 50%;
+    color: #fff;
+    cursor: help;
+    display: inline-flex;
+    font-size: 0.75rem;
+    height: 1.25rem;
+    justify-content: center;
+    margin-left: 0.25rem;
+    width: 1.25rem;
+}
+
 .usertable td {
     max-width: 150px;
     overflow-x: hidden;

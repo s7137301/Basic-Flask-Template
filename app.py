@@ -79,6 +79,7 @@ def init_full_db():
         ("listings", "enterprise_only", "INTEGER DEFAULT 0"),
         ("listings", "benchmark_score", "INTEGER DEFAULT 100"),
         ("listings", "allow_failover", "INTEGER DEFAULT 1"),
+        ("listings", "absorb_failovers", "INTEGER DEFAULT 0"),
         ("agreements", "fee_rate", "REAL DEFAULT 0.15"),
         ("agreements", "contract_type", "TEXT DEFAULT 'standard'"),
         ("agreements", "escrow_status", "TEXT DEFAULT 'held'"),
@@ -100,11 +101,11 @@ def create_listing():
 
     if request.method == 'POST':
         DATABASE.ModifyQuery(
-            "INSERT INTO listings (sellerid, title, hardware_type, ram_gb, hourly_price, enterprise_only, benchmark_score, allow_failover) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO listings (sellerid, title, hardware_type, ram_gb, hourly_price, enterprise_only, benchmark_score, allow_failover, absorb_failovers) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (session['userid'], request.form['title'], request.form['hardware_type'],
              int(request.form['ram_gb']), float(request.form['hourly_price']),
              int(request.form.get('enterprise_only', 0)), int(request.form.get('benchmark_score', 100)),
-             int(request.form.get('allow_failover', 1)))
+             int(request.form.get('allow_failover', 1)), int(request.form.get('absorb_failovers', 0)))
         )
         return redirect('./products')
 
@@ -270,7 +271,7 @@ def simulate_failover():
 
     remaining_hours = agreement['hours'] - actual_hours
     secondary = DATABASE.ViewQuery(
-        "SELECT listings.listingid, listings.sellerid, listings.hourly_price, users.firstname FROM listings JOIN users ON listings.sellerid = users.userid WHERE listings.status = 'available' AND listings.sellerid != ? ORDER BY listings.hourly_price ASC LIMIT 1",
+        "SELECT listings.listingid, listings.sellerid, listings.hourly_price, users.firstname FROM listings JOIN users ON listings.sellerid = users.userid WHERE listings.status = 'available' AND listings.absorb_failovers = 1 AND listings.sellerid != ? ORDER BY listings.hourly_price ASC LIMIT 1",
         (agreement['sellerid'],))
     if remaining_hours and not secondary:
         return jsonify({'status': 'error', 'message': 'No available secondary seller found.'}), 409
