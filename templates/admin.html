@@ -4,6 +4,20 @@
 
     <p>Welcome {{session['name']}}</p>
 
+    <section class="mb-5">
+        <h3>Enterprise Verification Queue</h3>
+        {% if enterprise_requests %}
+        <div class="responsive-table"><table class="table table-bordered"><thead><tr><th>Applicant</th><th>Email</th><th>Company</th><th>Actions</th></tr></thead><tbody>
+        {% for applicant in enterprise_requests %}
+            <tr><td>{{ applicant['firstname'] }} {{ applicant['lastname'] }}</td><td>{{ applicant['email'] }}</td><td>{{ applicant['company_name'] }}</td><td>
+                <form method="POST" class="d-inline"><button class="btn btn-success btn-sm" name="approve_enterprise" value="{{ applicant['userid'] }}">Approve</button></form>
+                <form method="POST" class="d-inline"><button class="btn btn-danger btn-sm" name="reject_enterprise" value="{{ applicant['userid'] }}">Reject</button></form>
+            </td></tr>
+        {% endfor %}
+        </tbody></table></div>
+        {% else %}<p class="alert alert-info">No enterprise applications are awaiting review.</p>{% endif %}
+    </section>
+
     {% if results %}
     <form action="/admin" method="POST">
         <table class="table usertable">

@@ -5,29 +5,34 @@
 
     {{message}}
 
-    <form action="/register" enctype="multipart/form-data" method="POST">
+    <form action="/register" enctype="multipart/form-data" method="POST" class="row g-3">
 
-        <label for="fname">First name:</label><br>
-            <input type="text" id="fname" name="fname" value="" required><br>
+        <div class="col-md-6"><label for="fname" class="form-label">First name</label>
+            <input type="text" class="form-control" id="fname" name="fname" value="" required></div>
             
-        <label for="lname">Last name:</label><br>
-            <input type="text" id="lname" name="lname" value="" required><br>
+        <div class="col-md-6"><label for="lname" class="form-label">Last name</label>
+            <input type="text" class="form-control" id="lname" name="lname" value="" required></div>
 
-        <label for="email">Email:</label><br>
-            <input type="email" id="email" name="email" value="" required><br>
+        <div class="col-12"><label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="" required></div>
 
-        <label for="password">Password:</label><br>
-            <input type="password" id="password" name="password" value="" required><br>
+        <div class="col-md-6"><label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" value="" required></div>
 
-        <label for="email">Password Confirm:</label><br>
-            <input type="password" id="passwordconfirm" name="passwordconfirm" value="" required><br>
-        <br>
+        <div class="col-md-6"><label for="passwordconfirm" class="form-label">Password Confirm</label>
+            <input type="password" class="form-control" id="passwordconfirm" name="passwordconfirm" value="" required></div>
 
-        <label for="profilephoto">Profile Photo:</label><br>
-            <input type="file" name="file">
-        <br>
+        <div class="col-12 form-check ms-2">
+            <input type="checkbox" class="form-check-input" id="enterprise_account" name="enterprise_account">
+            <label for="enterprise_account" class="form-check-label">Register as Enterprise Account</label>
+        </div>
+        <div class="col-12"><label for="company_name" class="form-label">Company Name</label>
+            <input type="text" class="form-control" id="company_name" name="company_name"></div>
 
-        <input type="submit" value="Submit">
+        <div class="col-12"><label for="profilephoto" class="form-label">Profile Photo</label>
+            <input type="file" class="form-control" name="file"></div>
+
+        <div class="col-12"><input class="btn btn-primary" type="submit" value="Create account"></div>
     </form> 
 
 {% endblock %}

@@ -74,6 +74,7 @@ def init_full_db():
     migrations = [
         ("users", "is_enterprise", "INTEGER DEFAULT 0"),
         ("users", "company_name", "TEXT"),
+        ("users", "enterprise_status", "TEXT DEFAULT 'none'"),
         ("users", "rating", "REAL DEFAULT 5.0"),
         ("listings", "enterprise_only", "INTEGER DEFAULT 0"),
         ("listings", "benchmark_score", "INTEGER DEFAULT 100"),
@@ -124,9 +125,24 @@ def admin():
         if session['permission'] != 'admin':
             return redirect("./")
 
-    results = DATABASE.ViewQuery("SELECT * FROM users")
+    results = DATABASE.ViewQuery("SELECT * FROM users") or []
+    enterprise_requests = DATABASE.ViewQuery(
+        "SELECT userid, firstname, lastname, email, company_name, enterprise_status FROM users WHERE enterprise_status = 'pending'"
+    ) or []
 
     if request.method == "POST":
+        approve_id = request.form.get('approve_enterprise')
+        reject_id = request.form.get('reject_enterprise')
+        if approve_id:
+            DATABASE.ModifyQuery(
+                "UPDATE users SET is_enterprise = 1, enterprise_status = 'approved' WHERE userid = ?",
+                (approve_id,))
+            return redirect("./admin")
+        if reject_id:
+            DATABASE.ModifyQuery(
+                "UPDATE users SET is_enterprise = 0, enterprise_status = 'rejected' WHERE userid = ?",
+                (reject_id,))
+            return redirect("./admin")
         selectedusers = request.form.getlist("selectedusers")
         for userid in selectedusers:
             if int(userid) != 1:
@@ -134,7 +150,7 @@ def admin():
         return redirect("./admin")
 
     app.logger.info("Admin")
-    return render_template("admin.html", results=results)
+    return render_template("admin.html", results=results, enterprise_requests=enterprise_requests)
 
 @app.route('/home')
 def home():
@@ -151,6 +167,8 @@ def home():
     active_rentals = DATABASE.ViewQuery(
         "SELECT agreements.*, listings.title FROM agreements JOIN listings ON agreements.listingid = listings.listingid WHERE agreements.buyerid = ? AND agreements.status = 'active'",
         (session['userid'],)) or []
+    listings_count = DATABASE.ViewQuery(
+        "SELECT COUNT(*) AS total FROM listings WHERE sellerid = ?", (session['userid'],))
     earnings = DATABASE.ViewQuery(
         "SELECT COALESCE(SUM(agreements.seller_payout), 0) AS total FROM agreements JOIN listings ON agreements.listingid = listings.listingid WHERE listings.sellerid = ?",
         (session['userid'],))
@@ -165,6 +183,8 @@ def home():
         'total_earnings': earnings[0]['total'] if earnings else 0,
         'escrow_balance': escrow[0]['total'] if escrow else 0,
         'reliability_score': reliability[0]['score'] if reliability else 100,
+        'listings_count': listings_count[0]['total'] if listings_count else 0,
+        'enterprise_pending': user.get('enterprise_status') == 'pending',
     }
     app.logger.info("Home")
     template = "enterprise_dashboard.html" if user.get('is_enterprise') == 1 else "home.html"
@@ -176,8 +196,8 @@ def products_for_rent():
     if 'userid' not in session:
         return redirect('./')
 
-    buyer = DATABASE.ViewQuery("SELECT is_enterprise FROM users WHERE userid = ?", (session['userid'],))
-    enterprise_access = 1 if buyer and buyer[0].get('is_enterprise') == 1 else 0
+    buyer = DATABASE.ViewQuery("SELECT is_enterprise, enterprise_status FROM users WHERE userid = ?", (session['userid'],))
+    enterprise_access = 1 if buyer and buyer[0].get('is_enterprise') == 1 and buyer[0].get('enterprise_status') == 'approved' else 0
     listings = DATABASE.ViewQuery("SELECT listings.*, users.firstname FROM listings JOIN users ON listings.sellerid = users.userid WHERE listings.status = 'available' AND (listings.enterprise_only = 0 OR listings.enterprise_only = ?)", (enterprise_access,))
     active_agreements = DATABASE.ViewQuery("SELECT agreements.* FROM agreements WHERE agreements.buyerid = ? AND agreements.status = 'active' ORDER BY agreements.agreementid DESC LIMIT 1", (session['userid'],))
     app.logger.info("Products for rent")
@@ -193,13 +213,17 @@ def checkout(listing_id):
         return "Listing is not available.", 404
 
     listing = listings[0]
-    buyer = DATABASE.ViewQuery("SELECT is_enterprise FROM users WHERE userid = ?", (session['userid'],))
-    is_enterprise = bool(buyer and buyer[0].get('is_enterprise') == 1)
+    buyer = DATABASE.ViewQuery("SELECT is_enterprise, enterprise_status FROM users WHERE userid = ?", (session['userid'],))
+    is_enterprise = bool(buyer and buyer[0].get('is_enterprise') == 1 and buyer[0].get('enterprise_status') == 'approved')
+    if listing.get('enterprise_only') and not is_enterprise:
+        return "This listing is available to approved enterprise accounts only.", 403
     fee_rate = 0.22 if is_enterprise else 0.15
     hours = int(request.form.get('hours', 1)) if request.method == 'POST' else 1
     allow_failover = request.form.get('allow_failover') == 'on' if request.method == 'POST' else bool(listing.get('allow_failover', 1))
     if hours < 1:
-        return render_template('checkout.html', listing=listing, hours=hours, error='Hours must be at least 1.'), 400
+        return render_template('checkout.html', listing=listing, hours=hours,
+                               error='Hours must be at least 1.', fee_rate=fee_rate,
+                               allow_failover=allow_failover, is_enterprise=is_enterprise), 400
 
     seller_payout = listing['hourly_price'] * hours
     buyer_fee = seller_payout * fee_rate
@@ -303,6 +327,10 @@ def terms():
 def privacy():
     return render_template('privacy.html')
 
+@app.route('/platform-agreement')
+def platform_agreement():
+    return render_template('platform_agreement.html')
+
 @app.route('/login')
 def login_page():
     return render_template('login.html', message='Please login')
@@ -327,7 +355,9 @@ def login():
                 session['permission'] = userdetails['permission']
                 session['userid'] = userdetails['userid']
                 session['name'] = userdetails['firstname'] + " " + userdetails['lastname']
-                session['profilephoto'] = userdetails['profilephoto']
+                session['profilephoto'] = userdetails.get('profilephoto', '')
+                session['is_enterprise'] = userdetails.get('is_enterprise', 0)
+                session['enterprise_status'] = userdetails.get('enterprise_status', 'none')
 
                 if session['permission'] == 'admin':
                     return redirect('./admin')
@@ -353,6 +383,8 @@ def register():
         password = request.form['password']
         passwordconfirm = request.form['passwordconfirm']
         email = request.form['email']
+        enterprise_requested = request.form.get('enterprise_account') == 'on'
+        company_name = request.form.get('company_name', '').strip() or None
 
         if password != passwordconfirm:
             message = "Error, passwords do not match"
@@ -379,9 +411,15 @@ def register():
                     flash("File not found")
 
                 password = hash_password(password)
-                DATABASE.ModifyQuery("INSERT INTO users (firstname, lastname, email, password, profilephoto) VALUES (?,?,?,?,?)", (firstname, lastname, email, password,filepath))
-                message = "Success, users has been added"
-                return redirect('./')
+                DATABASE.ModifyQuery("INSERT INTO users (firstname, lastname, email, password, profilephoto, is_enterprise, company_name, enterprise_status) VALUES (?,?,?,?,?,?,?,?)", (firstname, lastname, email, password, filepath, 0, company_name if enterprise_requested else None, 'pending' if enterprise_requested else 'none'))
+                new_user = DATABASE.ViewQuery("SELECT * FROM users WHERE email = ?", (email,))[0]
+                session['userid'] = new_user['userid']
+                session['permission'] = new_user.get('permission', 'user')
+                session['name'] = new_user['firstname'] + " " + new_user['lastname']
+                session['profilephoto'] = new_user.get('profilephoto', '')
+                session['is_enterprise'] = new_user.get('is_enterprise', 0)
+                session['enterprise_status'] = new_user.get('enterprise_status', 'none')
+                return redirect('/home')
 
     return render_template("register.html", message=message)
 

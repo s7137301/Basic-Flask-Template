@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block content %}
+<article class="legal-document">
+    <h2>Master Platform Compute Agreement</h2>
+    <p class="text-muted">This agreement defines the binding rules between Buyers, Sellers, and the Platform.</p>
+    <h3>1. Parties and service</h3>
+    <p>The Seller supplies the listed compute capacity, the Buyer purchases authorized workload time, and the Platform provides discovery, contract records, escrow accounting, and administrative controls.</p>
+    <h3>2. Pricing and escrow</h3>
+    <p>The Seller's payout equals the listed hourly price multiplied by completed hours. The Buyer pays that payout plus the applicable platform fee: 15% for standard buyers and 22% for approved enterprise buyers. At confirmation, the payment is recorded as held in escrow.</p>
+    <h3>3. Availability and failover</h3>
+    <p>Automatic SLA Workload Failover applies only when selected at checkout. After a node interruption, completed hours are paid pro rata to the original Seller. Remaining hours may be assigned to an available secondary Seller at 80% of the original base rate. A 20% platform penalty is retained for the disrupted portion and the agreement escrow state becomes partial_released.</p>
+    <h3>4. Acceptable use and security</h3>
+    <p>Parties must use the service lawfully, protect passwords and credentials, and avoid malware, abuse, unauthorized access, denial-of-service activity, and workloads that damage or interfere with infrastructure. Profile uploads and workload inputs must not contain secrets or unsafe content.</p>
+    <h3>5. Records and disputes</h3>
+    <p>Agreement, rating, escrow, and SLA records may be retained for service delivery, support, dispute resolution, and legal obligations. The Platform may suspend accounts or listings that breach this agreement.</p>
+</article>
+{% endblock %}
