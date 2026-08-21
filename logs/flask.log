@@ -23,3 +23,62 @@ INFO:app:Login
 INFO:werkzeug:127.0.0.1 - - [19/Aug/2026 12:28:38] "GET / HTTP/1.1" 200 -
 INFO:werkzeug:127.0.0.1 - - [19/Aug/2026 12:28:38] "GET /static/css/custom.css HTTP/1.1" 200 -
 INFO:werkzeug:127.0.0.1 - - [19/Aug/2026 12:28:38] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Products for rent
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.0.224.59:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 593-560-539
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:24:22] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:24:22] "GET /static/js/new_ajax_helper.js HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:24:22] "GET /static/css/custom.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:24:23] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:24:33] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:24:33] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:24:33] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:25:13] "[32mPOST / HTTP/1.1[0m" 302 -
+INFO:app:Admin
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:25:13] "GET /admin HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:25:13] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:25:14] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Products for rent
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:25:35] "GET /products HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:25:35] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:25:35] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:25:42] "GET /create-listing HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:25:42] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:25:42] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Products for rent
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:25:49] "GET /products HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:25:49] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:25:49] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:25:53] "POST /api/run-task HTTP/1.1" 200 -
+INFO:app:Admin
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:26:03] "GET /admin HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:26:03] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:26:03] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:26:21] "[33mPOST /backdoor HTTP/1.1[0m" 404 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:26:27] "[32mGET / HTTP/1.1[0m" 302 -
+INFO:app:Admin
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:26:28] "GET /admin HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:26:28] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:26:28] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:26:31] "[32mGET / HTTP/1.1[0m" 302 -
+INFO:app:Admin
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:26:31] "GET /admin HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:26:31] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:26:31] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Log out
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:26:35] "[32mGET /logout HTTP/1.1[0m" 302 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:26:35] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:26:35] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 12:26:35] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -

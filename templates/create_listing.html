@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h2>List Hardware</h2>
+    <p class="text-muted">Offer your idle compute power to marketplace buyers.</p>
+
+    <form action="/create-listing" method="POST" class="row g-3">
+        <div class="col-12">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+        </div>
+        <div class="col-md-6">
+            <label for="hardware_type" class="form-label">Hardware Type</label>
+            <select class="form-select" id="hardware_type" name="hardware_type" required>
+                <option value="PC">PC</option>
+                <option value="GPU">GPU</option>
+                <option value="Server">Server</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="ram_gb" class="form-label">RAM (GB)</label>
+            <input type="number" class="form-control" id="ram_gb" name="ram_gb" min="1" required>
+        </div>
+        <div class="col-md-3">
+            <label for="hourly_price" class="form-label">Hourly Price ($)</label>
+            <input type="number" class="form-control" id="hourly_price" name="hourly_price" min="0" step="0.01" required>
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Publish Listing</button>
+        </div>
+    </form>
+{% endblock %}

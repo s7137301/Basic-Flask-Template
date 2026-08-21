@@ -28,6 +28,8 @@
                     {% if 'userid' not in session %}
                         <a href="/register" class="nav-item nav-link">Register</a>
                     {% else %}
+                        <a href="/products" class="nav-item nav-link">Marketplace</a>
+                        <a href="/create-listing" class="nav-item nav-link">List Hardware</a>
                         {% if session['permission'] == 'admin' %}
                             <a href="/admin" class="nav-item nav-link">Admin</a>
                         {% endif %}
