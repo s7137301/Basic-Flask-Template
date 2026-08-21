@@ -25,9 +25,12 @@
             <div class="collapse navbar-collapse" id="navbarCollapse2">
                 <div class="navbar-nav">
                     <a href="/" class="nav-item nav-link">Home</a>
+                    <a href="/terms" class="nav-item nav-link">Terms</a>
+                    <a href="/privacy" class="nav-item nav-link">Privacy</a>
                     {% if 'userid' not in session %}
                         <a href="/register" class="nav-item nav-link">Register</a>
                     {% else %}
+                        <a href="/home" class="nav-item nav-link">Dashboard</a>
                         <a href="/products" class="nav-item nav-link">Marketplace</a>
                         <a href="/create-listing" class="nav-item nav-link">List Hardware</a>
                         {% if session['permission'] == 'admin' %}
@@ -36,7 +39,11 @@
                     {% endif %}
                 </div>
             </div>
-            <a href="/logout" class="nav-item nav-link ms-auto">Logout</a>
+            {% if 'userid' in session %}
+                <a href="/logout" class="nav-item nav-link ms-auto">Logout</a>
+            {% else %}
+                <a href="/" class="nav-item nav-link ms-auto">Login</a>
+            {% endif %}
         </nav><br>
 
     <!-- PYTHON FOR TEMPLATE INHERITANCE HERE -->

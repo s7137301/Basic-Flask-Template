@@ -10,6 +10,10 @@
     <form action="/checkout/{{ listing['listingid'] }}" method="POST" class="col-md-6">
         <label for="hours" class="form-label">Hours</label>
         <input type="number" class="form-control" id="hours" name="hours" min="1" value="{{ hours }}" required>
+        <div class="form-check mt-3">
+            <input type="checkbox" class="form-check-input" id="allow_failover" name="allow_failover" {% if allow_failover %}checked{% endif %}>
+            <label class="form-check-label" for="allow_failover">Enable Automatic SLA Workload Failover</label>
+        </div>
         <button type="submit" class="btn btn-success mt-3">Confirm Rental</button>
     </form>
 
@@ -18,7 +22,7 @@
         <dl class="row">
             <dt class="col-8">Seller payout</dt>
             <dd class="col-4">${{ '%.2f'|format(seller_payout|default(0)) }}</dd>
-            <dt class="col-8">Platform fee (15%)</dt>
+            <dt class="col-8">Platform fee ({{ (fee_rate * 100)|round|int }}%)</dt>
             <dd class="col-4">${{ '%.2f'|format(buyer_fee|default(0)) }}</dd>
             <dt class="col-8"><strong>Total cost</strong></dt>
             <dd class="col-4"><strong>${{ '%.2f'|format(total_cost|default(0)) }}</strong></dd>

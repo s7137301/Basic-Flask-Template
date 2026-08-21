@@ -6,6 +6,10 @@
     margin-left: 20px;
 }
 
+.landing-copy {
+    max-width: 680px;
+}
+
 .usertable td {
     max-width: 150px;
     overflow-x: hidden;
@@ -16,4 +20,26 @@
     width:200px;
     height:200px;
     border:1px solid black;
+}
+
+.card {
+    border: 1px solid #7c5cff;
+    box-shadow: 0 0 12px rgba(124, 92, 255, 0.18) !important;
+}
+
+.status-badge {
+    border-radius: 999px;
+    color: #fff;
+    display: inline-block;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.6rem;
+}
+
+.status-available { background: #198754; }
+.status-rented { background: #6c757d; }
+.status-offloaded, .status-failed_over { background: #fd7e14; }
+
+.responsive-table { overflow-x: auto; }
+@media (max-width: 768px) {
+    .responsive-table table { min-width: 620px; }
 }

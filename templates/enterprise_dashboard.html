@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Enterprise Control Center</h2>
+<p class="text-muted">Welcome {{ session['name'] }}. Your enterprise contracts use SLA-aware pricing and escrow.</p>
+<div class="row g-4 mb-4">
+    <div class="col-md-3"><div class="card p-3"><small>Active rentals</small><strong class="fs-3">{{ active_rentals|length }}</strong></div></div>
+    <div class="col-md-3"><div class="card p-3"><small>Total earnings</small><strong class="fs-3">${{ '%.2f'|format(total_earnings) }}</strong></div></div>
+    <div class="col-md-3"><div class="card p-3"><small>Escrow balance</small><strong class="fs-3">${{ '%.2f'|format(escrow_balance) }}</strong></div></div>
+    <div class="col-md-3"><div class="card p-3"><small>SLA reliability</small><strong class="fs-3">{{ '%.1f'|format(reliability_score) }}%</strong></div></div>
+</div>
+<a class="btn btn-primary" href="/products">Browse enterprise compute</a>
+{% endblock %}

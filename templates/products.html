@@ -34,6 +34,22 @@
         <pre id="task-output" class="mt-3 p-3 bg-light">Ready to run.</pre>
     </section>
 
+    {% if active_agreement %}
+    <section class="mt-5" aria-labelledby="failover-heading">
+        <h3 id="failover-heading">SLA failover simulation</h3>
+        <p>Use this test control to simulate a node disconnect on agreement #{{ active_agreement['agreementid'] }}.</p>
+        <form id="failover-form" class="row g-2 align-items-end">
+            <input type="hidden" name="agreement_id" value="{{ active_agreement['agreementid'] }}">
+            <div class="col-auto">
+                <label for="actual_completed_hours" class="form-label">Completed hours</label>
+                <input type="number" class="form-control" id="actual_completed_hours" name="actual_completed_hours" min="0" max="{{ active_agreement['hours'] }}" value="0" required>
+            </div>
+            <div class="col-auto"><button type="submit" class="btn btn-warning">Simulate node disconnect</button></div>
+        </form>
+        <pre id="failover-output" class="mt-3 p-3 bg-light">No failover simulated.</pre>
+    </section>
+    {% endif %}
+
 {% endblock %}
 {% block scripts %}
 <script>
@@ -44,5 +60,16 @@
             output.textContent = results.output;
         }, new FormData(), 'POST');
     });
+    var failoverForm = document.getElementById('failover-form');
+    if (failoverForm) {
+        failoverForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            new_ajax_helper('/api/simulate-failover', function (results) {
+                document.getElementById('failover-output').textContent = results.status === 'success'
+                    ? 'Failover complete. Remaining hours: ' + results.remaining_hours + '. Penalty: $' + results.penalty_fee.toFixed(2)
+                    : results.message;
+            }, new FormData(failoverForm), 'POST');
+        });
+    }
 </script>
 {% endblock %}

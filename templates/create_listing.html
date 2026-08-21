@@ -24,6 +24,18 @@
             <label for="hourly_price" class="form-label">Hourly Price ($)</label>
             <input type="number" class="form-control" id="hourly_price" name="hourly_price" min="0" step="0.01" required>
         </div>
+        <div class="col-md-4 form-check ms-2">
+            <input type="checkbox" class="form-check-input" id="enterprise_only" name="enterprise_only">
+            <label class="form-check-label" for="enterprise_only">Enterprise buyers only</label>
+        </div>
+        <div class="col-md-4">
+            <label for="benchmark_score" class="form-label">Benchmark Score</label>
+            <input type="number" class="form-control" id="benchmark_score" name="benchmark_score" min="1" value="100" required>
+        </div>
+        <div class="col-md-4 form-check ms-2">
+            <input type="checkbox" class="form-check-input" id="allow_failover" name="allow_failover" checked>
+            <label class="form-check-label" for="allow_failover">Allow SLA failover</label>
+        </div>
         <div class="col-12">
             <button type="submit" class="btn btn-primary">Publish Listing</button>
         </div>

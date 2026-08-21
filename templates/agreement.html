@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Agreement #{{ agreement['agreementid'] }}</h2>
+<p class="text-muted">Legal compute rental contract for {{ agreement['title'] }}.</p>
+<div class="responsive-table">
+<table class="table table-bordered">
+    <tr><th>Buyer</th><td>{{ agreement['buyer_name'] }}</td><th>Seller</th><td>{{ agreement['seller_name'] }}</td></tr>
+    <tr><th>Contract type</th><td>{{ agreement['contract_type' ] }}</td><th>Escrow state</th><td>{{ agreement['escrow_status'] }}</td></tr>
+    <tr><th>Hours</th><td>{{ agreement['hours'] }}</td><th>Completed hours</th><td>{{ agreement['completed_hours'] }}</td></tr>
+    <tr><th>Fee rate</th><td>{{ (agreement['fee_rate'] * 100)|round|int }}%</td><th>Penalty fee</th><td>${{ '%.2f'|format(agreement['penalty_fee']) }}</td></tr>
+    <tr><th>Seller payout</th><td>${{ '%.2f'|format(agreement['seller_payout']) }}</td><th>Buyer fee</th><td>${{ '%.2f'|format(agreement['buyer_fee']) }}</td></tr>
+    <tr><th>Total cost</th><td>${{ '%.2f'|format(agreement['total_cost']) }}</td><th>Failover seller</th><td>{{ agreement['offloaded_to_sellerid'] or 'None' }}</td></tr>
+</table>
+</div>
+<p><span class="status-badge status-{{ agreement['escrow_status'] }}">Escrow: {{ agreement['escrow_status'] }}</span></p>
+<p>This agreement records the seller payout, buyer platform fee, escrow state, and SLA penalty terms accepted at checkout.</p>
+<form action="/agreement/{{ agreement['agreementid'] }}/rate" method="POST" class="mt-4 col-md-6">
+    <label for="score" class="form-label">Rate this seller</label>
+    <select id="score" name="score" class="form-select" required>
+        <option value="5">5 - Excellent</option>
+        <option value="4">4 - Good</option>
+        <option value="3">3 - Satisfactory</option>
+        <option value="2">2 - Poor</option>
+        <option value="1">1 - Unacceptable</option>
+    </select>
+    <textarea name="comment" class="form-control mt-2" placeholder="Optional comment"></textarea>
+    <button type="submit" class="btn btn-outline-primary mt-2">Submit rating</button>
+</form>
+{% endblock %}

@@ -55,6 +55,43 @@ def init_db():
     """)
     return "Marketplace database tables are ready."
 
+@app.route('/init-full-db')
+def init_full_db():
+    init_db()
+    DATABASE.ModifyQuery("""
+        CREATE TABLE IF NOT EXISTS ratings (
+            ratingid INTEGER PRIMARY KEY AUTOINCREMENT,
+            agreementid INTEGER NOT NULL,
+            raterid INTEGER NOT NULL,
+            sellerid INTEGER NOT NULL,
+            score INTEGER NOT NULL CHECK(score BETWEEN 1 AND 5),
+            comment TEXT,
+            FOREIGN KEY(agreementid) REFERENCES agreements(agreementid),
+            FOREIGN KEY(raterid) REFERENCES users(userid),
+            FOREIGN KEY(sellerid) REFERENCES users(userid)
+        )
+    """)
+    migrations = [
+        ("users", "is_enterprise", "INTEGER DEFAULT 0"),
+        ("users", "company_name", "TEXT"),
+        ("users", "rating", "REAL DEFAULT 5.0"),
+        ("listings", "enterprise_only", "INTEGER DEFAULT 0"),
+        ("listings", "benchmark_score", "INTEGER DEFAULT 100"),
+        ("listings", "allow_failover", "INTEGER DEFAULT 1"),
+        ("agreements", "fee_rate", "REAL DEFAULT 0.15"),
+        ("agreements", "contract_type", "TEXT DEFAULT 'standard'"),
+        ("agreements", "escrow_status", "TEXT DEFAULT 'held'"),
+        ("agreements", "completed_hours", "INTEGER DEFAULT 0"),
+        ("agreements", "offloaded_to_sellerid", "INTEGER NULL"),
+        ("agreements", "penalty_fee", "REAL DEFAULT 0.0"),
+        ("agreements", "allow_failover", "INTEGER DEFAULT 1"),
+    ]
+    for table, column, definition in migrations:
+        existing_columns = DATABASE.ViewQuery("PRAGMA table_info(" + table + ")")
+        if not existing_columns or column not in {row['name'] for row in existing_columns}:
+            DATABASE.ModifyQuery("ALTER TABLE " + table + " ADD COLUMN " + column + " " + definition)
+    return "Full marketplace database schema is ready."
+
 @app.route('/create-listing', methods=['GET', 'POST'])
 def create_listing():
     if 'userid' not in session:
@@ -62,9 +99,11 @@ def create_listing():
 
     if request.method == 'POST':
         DATABASE.ModifyQuery(
-            "INSERT INTO listings (sellerid, title, hardware_type, ram_gb, hourly_price) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO listings (sellerid, title, hardware_type, ram_gb, hourly_price, enterprise_only, benchmark_score, allow_failover) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             (session['userid'], request.form['title'], request.form['hardware_type'],
-             int(request.form['ram_gb']), float(request.form['hourly_price']))
+             int(request.form['ram_gb']), float(request.form['hourly_price']),
+             int(request.form.get('enterprise_only', 0)), int(request.form.get('benchmark_score', 100)),
+             int(request.form.get('allow_failover', 1)))
         )
         return redirect('./products')
 
@@ -103,8 +142,33 @@ def home():
     if 'userid' not in session:
         return redirect('./')
 
+    user = DATABASE.ViewQuery("SELECT * FROM users WHERE userid = ?", (session['userid'],))
+    if not user:
+        session.clear()
+        return redirect('./')
+
+    user = user[0]
+    active_rentals = DATABASE.ViewQuery(
+        "SELECT agreements.*, listings.title FROM agreements JOIN listings ON agreements.listingid = listings.listingid WHERE agreements.buyerid = ? AND agreements.status = 'active'",
+        (session['userid'],)) or []
+    earnings = DATABASE.ViewQuery(
+        "SELECT COALESCE(SUM(agreements.seller_payout), 0) AS total FROM agreements JOIN listings ON agreements.listingid = listings.listingid WHERE listings.sellerid = ?",
+        (session['userid'],))
+    escrow = DATABASE.ViewQuery(
+        "SELECT COALESCE(SUM(total_cost), 0) AS total FROM agreements WHERE buyerid = ? AND escrow_status IN ('held', 'partial_released')",
+        (session['userid'],))
+    reliability = DATABASE.ViewQuery(
+        "SELECT COALESCE(AVG(CASE WHEN hours = 0 THEN 100.0 ELSE completed_hours * 100.0 / hours END), 100.0) AS score FROM agreements WHERE buyerid = ?",
+        (session['userid'],))
+    dashboard = {
+        'active_rentals': active_rentals,
+        'total_earnings': earnings[0]['total'] if earnings else 0,
+        'escrow_balance': escrow[0]['total'] if escrow else 0,
+        'reliability_score': reliability[0]['score'] if reliability else 100,
+    }
     app.logger.info("Home")
-    return render_template("home.html")
+    template = "enterprise_dashboard.html" if user.get('is_enterprise') == 1 else "home.html"
+    return render_template(template, user=user, **dashboard)
 
 @app.route('/products')
 def products_for_rent():
@@ -112,9 +176,12 @@ def products_for_rent():
     if 'userid' not in session:
         return redirect('./')
 
-    listings = DATABASE.ViewQuery("SELECT listings.*, users.firstname FROM listings JOIN users ON listings.sellerid = users.userid WHERE listings.status = 'available'")
+    buyer = DATABASE.ViewQuery("SELECT is_enterprise FROM users WHERE userid = ?", (session['userid'],))
+    enterprise_access = 1 if buyer and buyer[0].get('is_enterprise') == 1 else 0
+    listings = DATABASE.ViewQuery("SELECT listings.*, users.firstname FROM listings JOIN users ON listings.sellerid = users.userid WHERE listings.status = 'available' AND (listings.enterprise_only = 0 OR listings.enterprise_only = ?)", (enterprise_access,))
+    active_agreements = DATABASE.ViewQuery("SELECT agreements.* FROM agreements WHERE agreements.buyerid = ? AND agreements.status = 'active' ORDER BY agreements.agreementid DESC LIMIT 1", (session['userid'],))
     app.logger.info("Products for rent")
-    return render_template("products.html", listings=listings or [])
+    return render_template("products.html", listings=listings or [], active_agreement=active_agreements[0] if active_agreements else None)
 
 @app.route('/checkout/<int:listing_id>', methods=['GET', 'POST'])
 def checkout(listing_id):
@@ -126,39 +193,126 @@ def checkout(listing_id):
         return "Listing is not available.", 404
 
     listing = listings[0]
+    buyer = DATABASE.ViewQuery("SELECT is_enterprise FROM users WHERE userid = ?", (session['userid'],))
+    is_enterprise = bool(buyer and buyer[0].get('is_enterprise') == 1)
+    fee_rate = 0.22 if is_enterprise else 0.15
     hours = int(request.form.get('hours', 1)) if request.method == 'POST' else 1
+    allow_failover = request.form.get('allow_failover') == 'on' if request.method == 'POST' else bool(listing.get('allow_failover', 1))
     if hours < 1:
         return render_template('checkout.html', listing=listing, hours=hours, error='Hours must be at least 1.'), 400
 
     seller_payout = listing['hourly_price'] * hours
-    buyer_fee = seller_payout * 0.15
+    buyer_fee = seller_payout * fee_rate
     total_cost = seller_payout + buyer_fee
 
     if request.method == 'POST':
         DATABASE.ModifyQuery(
-            "INSERT INTO agreements (listingid, buyerid, hours, seller_payout, buyer_fee, total_cost) VALUES (?, ?, ?, ?, ?, ?)",
-            (listing_id, session['userid'], hours, seller_payout, buyer_fee, total_cost)
+            "INSERT INTO agreements (listingid, buyerid, hours, seller_payout, buyer_fee, total_cost, fee_rate, contract_type, escrow_status, allow_failover) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (listing_id, session['userid'], hours, seller_payout, buyer_fee, total_cost, fee_rate,
+             'enterprise' if is_enterprise else 'standard', 'held', int(allow_failover))
         )
         DATABASE.ModifyQuery("UPDATE listings SET status = 'rented' WHERE listingid = ?", (listing_id,))
         return redirect('./products')
 
     return render_template('checkout.html', listing=listing, hours=hours,
                            seller_payout=seller_payout, buyer_fee=buyer_fee,
-                           total_cost=total_cost)
+                           total_cost=total_cost, fee_rate=fee_rate,
+                           allow_failover=allow_failover, is_enterprise=is_enterprise)
 
 @app.route('/api/run-task', methods=['POST'])
 def run_task():
     return jsonify({'status': 'success', 'output': 'Task executed inside simulated sandbox container.'})
 
+@app.route('/api/simulate-failover', methods=['POST'])
+def simulate_failover():
+    if 'userid' not in session:
+        return jsonify({'status': 'error', 'message': 'Login required.'}), 401
+    try:
+        agreement_id = int(request.form['agreement_id'])
+        actual_hours = int(request.form['actual_completed_hours'])
+    except (KeyError, TypeError, ValueError):
+        return jsonify({'status': 'error', 'message': 'Valid agreement and completed hours are required.'}), 400
+
+    agreements = DATABASE.ViewQuery(
+        "SELECT agreements.*, listings.hourly_price, listings.sellerid, listings.allow_failover FROM agreements JOIN listings ON agreements.listingid = listings.listingid WHERE agreements.agreementid = ? AND agreements.buyerid = ?",
+        (agreement_id, session['userid']))
+    if not agreements:
+        return jsonify({'status': 'error', 'message': 'Agreement not found.'}), 404
+    agreement = agreements[0]
+    if not agreement['allow_failover'] or not agreement.get('allow_failover', 1):
+        return jsonify({'status': 'error', 'message': 'Failover is disabled for this agreement.'}), 400
+    if actual_hours < 0 or actual_hours > agreement['hours']:
+        return jsonify({'status': 'error', 'message': 'Completed hours are outside the agreement.'}), 400
+
+    remaining_hours = agreement['hours'] - actual_hours
+    secondary = DATABASE.ViewQuery(
+        "SELECT listings.listingid, listings.sellerid, listings.hourly_price, users.firstname FROM listings JOIN users ON listings.sellerid = users.userid WHERE listings.status = 'available' AND listings.sellerid != ? ORDER BY listings.hourly_price ASC LIMIT 1",
+        (agreement['sellerid'],))
+    if remaining_hours and not secondary:
+        return jsonify({'status': 'error', 'message': 'No available secondary seller found.'}), 409
+
+    partial_payout = actual_hours * agreement['hourly_price']
+    penalty_fee = remaining_hours * agreement['hourly_price'] * 0.20
+    secondary_sellerid = secondary[0]['sellerid'] if remaining_hours else None
+    DATABASE.ModifyQuery(
+        "UPDATE agreements SET completed_hours = ?, offloaded_to_sellerid = ?, penalty_fee = ?, escrow_status = 'partial_released' WHERE agreementid = ?",
+        (actual_hours, secondary_sellerid, penalty_fee, agreement_id))
+    if secondary_sellerid:
+        DATABASE.ModifyQuery("UPDATE listings SET status = 'failed_over' WHERE listingid = ?", (agreement['listingid'],))
+        DATABASE.ModifyQuery("UPDATE listings SET status = 'rented' WHERE listingid = ?", (secondary[0]['listingid'],))
+    return jsonify({'status': 'success', 'partial_payout': partial_payout,
+                    'remaining_hours': remaining_hours, 'discounted_rate': agreement['hourly_price'] * 0.80,
+                    'penalty_fee': penalty_fee, 'offloaded_to_sellerid': secondary_sellerid,
+                    'escrow_status': 'partial_released'})
+
+@app.route('/agreement/<int:agreement_id>')
+def agreement(agreement_id):
+    if 'userid' not in session:
+        return redirect('./')
+    agreements = DATABASE.ViewQuery(
+        "SELECT agreements.*, listings.title, listings.hourly_price, listings.sellerid, sellers.firstname AS seller_name, buyers.firstname AS buyer_name FROM agreements JOIN listings ON agreements.listingid = listings.listingid JOIN users AS sellers ON listings.sellerid = sellers.userid JOIN users AS buyers ON agreements.buyerid = buyers.userid WHERE agreements.agreementid = ? AND (agreements.buyerid = ? OR listings.sellerid = ?)",
+        (agreement_id, session['userid'], session['userid']))
+    if not agreements:
+        return "Agreement not found.", 404
+    return render_template('agreement.html', agreement=agreements[0])
+
+@app.route('/agreement/<int:agreement_id>/rate', methods=['POST'])
+def rate_agreement(agreement_id):
+    if 'userid' not in session:
+        return redirect('./')
+    try:
+        score = int(request.form['score'])
+    except (KeyError, TypeError, ValueError):
+        return "Rating must be a whole number from 1 to 5.", 400
+    agreement_rows = DATABASE.ViewQuery(
+        "SELECT listings.sellerid FROM agreements JOIN listings ON agreements.listingid = listings.listingid WHERE agreements.agreementid = ? AND agreements.buyerid = ?",
+        (agreement_id, session['userid']))
+    if not agreement_rows or score < 1 or score > 5:
+        return "Rating is not valid for this agreement.", 400
+    sellerid = agreement_rows[0]['sellerid']
+    DATABASE.ModifyQuery("INSERT INTO ratings (agreementid, raterid, sellerid, score, comment) VALUES (?, ?, ?, ?, ?)",
+                          (agreement_id, session['userid'], sellerid, score, request.form.get('comment', '')))
+    DATABASE.ModifyQuery("UPDATE users SET rating = (SELECT AVG(score) FROM ratings WHERE sellerid = ?) WHERE userid = ?", (sellerid, sellerid))
+    return redirect('/agreement/' + str(agreement_id))
+
+@app.route('/terms')
+def terms():
+    return render_template('terms.html')
+
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
+
+@app.route('/login')
+def login_page():
+    return render_template('login.html', message='Please login')
+
 @app.route('/', methods=["GET","POST"])
 def login():
     app.logger.info("Login")
 
-    if 'permission' in session:
-        if session['permission'] == 'admin':
-            return redirect("./admin")
-        else:
-            return redirect("./home")
+    if 'userid' in session:
+        return redirect("./home")
 
     message = "Please login"
     if request.method == "POST":
@@ -184,6 +338,8 @@ def login():
         else:
             message = "User does not exist, email is incorrect!!"
 
+    if request.method == "GET":
+        return render_template("landing.html")
     return render_template("login.html", message=message)
 
 @app.route('/register', methods=['GET','POST'])

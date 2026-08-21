@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="py-5 text-center">
+    <p class="text-uppercase text-muted">Compute marketplace</p>
+    <h1 class="display-4">Rent reliable compute. Monetise idle hardware.</h1>
+    <p class="lead mx-auto landing-copy">A practical marketplace for on-demand PC, GPU, and server capacity with transparent escrow and SLA-aware failover.</p>
+    <a href="/register" class="btn btn-primary btn-lg me-2">Start listing hardware</a>
+    <a href="/login" class="btn btn-outline-secondary btn-lg">Sign in</a>
+</section>
+<section class="row g-4 py-4">
+    <div class="col-md-4"><div class="card h-100 p-4"><h3>1. List</h3><p>Describe your hardware, benchmark score, and hourly rate.</p></div></div>
+    <div class="col-md-4"><div class="card h-100 p-4"><h3>2. Rent</h3><p>Buyers choose available capacity and approve a clear agreement.</p></div></div>
+    <div class="col-md-4"><div class="card h-100 p-4"><h3>3. Execute</h3><p>Escrow and SLA failover keep workloads moving when nodes disconnect.</p></div></div>
+</section>
+<section class="text-center border-top py-4">
+    <h2>100% seller payout</h2>
+    <p class="mb-0">Sellers keep their asking price. Platform fees are shown separately and added to the buyer total.</p>
+</section>
+{% endblock %}
