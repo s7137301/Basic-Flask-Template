@@ -25,13 +25,15 @@
     </div>
 </section>
 <section class="row g-4 py-5 border-top">
-    <div class="col-lg-6"><h2>Dynamic fee calculator</h2><p>Estimate the buyer total before you sign an agreement.</p>
-        <form id="fee-calculator" class="row g-2">
-            <div class="col-6"><label class="form-label" for="calc-rate">Hourly seller rate</label><input class="form-control" id="calc-rate" type="number" min="0" step="0.01" value="10"></div>
-            <div class="col-6"><label class="form-label" for="calc-hours">Hours</label><input class="form-control" id="calc-hours" type="number" min="1" value="5"></div>
-            <div class="col-12"><label class="form-check-label"><input class="form-check-input" id="calc-enterprise" type="checkbox"> Enterprise rate (22%)</label></div>
+    <div class="col-lg-6"><h2>Hardware Earnings Estimator</h2><p>Choose your hardware and estimate seller earnings from 100% of your asking rate.</p>
+        <form id="earnings-calculator" class="row g-2">
+            <div class="col-6"><label class="form-label" for="calc-cpu">CPU</label><select class="form-select" id="calc-cpu">{% for name, rate in hardware_rates['CPUs'].items() %}<option value="{{ rate }}">{{ name }}</option>{% endfor %}</select></div>
+            <div class="col-6"><label class="form-label" for="calc-gpu">GPU</label><select class="form-select" id="calc-gpu">{% for name, rate in hardware_rates['GPUs'].items() %}<option value="{{ rate }}">{{ name }}</option>{% endfor %}</select></div>
+            <div class="col-6"><label class="form-label" for="calc-ram">RAM (GB)</label><select class="form-select" id="calc-ram"><option>8</option><option>16</option><option selected>32</option><option>64</option><option>128</option></select></div>
+            <div class="col-6"><label class="form-label" for="calc-uptime">Daily uptime (hours)</label><input class="form-control" id="calc-uptime" type="number" min="1" max="24" value="8"></div>
         </form>
-        <p class="fs-4 mt-3">Buyer total: <strong id="calc-total">$57.50</strong></p>
+        <div class="row mt-3"><div class="col-4"><small>Daily Earnings</small><strong class="d-block" id="calc-daily">$0.00</strong></div><div class="col-4"><small>Monthly Revenue</small><strong class="d-block" id="calc-monthly">$0.00</strong></div><div class="col-4"><small>Seller payout</small><strong class="d-block">100%</strong></div></div>
+        <a href="/register" class="btn btn-primary mt-3">Start Earning with This Hardware</a>
     </div>
     <div class="col-lg-6"><h2>Container security</h2><p>Tasks run in a simulated sandbox boundary. Keep credentials private, use strong unique passwords, and never upload secrets or personal data with a profile or workload.</p><h3>SLA failover guarantee</h3><p>When a node disconnects, eligible remaining hours can be offloaded at 80% of the base rate. The original seller is paid for completed hours and a 20% platform penalty is retained for the disrupted portion.</p></div>
 </section>
@@ -43,12 +45,14 @@
 {% endblock %}
 {% block scripts %}
 <script>
-    function updateFee() {
-        var rate = parseFloat(document.getElementById('calc-rate').value) || 0;
-        var hours = parseInt(document.getElementById('calc-hours').value, 10) || 0;
-        var feeRate = document.getElementById('calc-enterprise').checked ? 0.22 : 0.15;
-        document.getElementById('calc-total').textContent = '$' + (rate * hours * (1 + feeRate)).toFixed(2);
+    function updateEarnings() {
+        var rate = (parseFloat(document.getElementById('calc-cpu').value) || 0) + (parseFloat(document.getElementById('calc-gpu').value) || 0);
+        var uptime = Math.min(24, Math.max(1, parseInt(document.getElementById('calc-uptime').value, 10) || 1));
+        var daily = rate * uptime;
+        document.getElementById('calc-daily').textContent = '$' + daily.toFixed(2);
+        document.getElementById('calc-monthly').textContent = '$' + (daily * 30).toFixed(2);
     }
-    document.querySelectorAll('#fee-calculator input').forEach(function (input) { input.addEventListener('input', updateFee); });
+    document.querySelectorAll('#earnings-calculator input, #earnings-calculator select').forEach(function (input) { input.addEventListener('input', updateEarnings); input.addEventListener('change', updateEarnings); });
+    updateEarnings();
 </script>
 {% endblock %}

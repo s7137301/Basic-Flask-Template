@@ -292,3 +292,96 @@ INFO:werkzeug: * Detected change in "c:\\Users\\S7137301\\OneDrive - St Joseph's
 INFO:werkzeug: * Restarting with stat
 WARNING:werkzeug: * Debugger is active!
 INFO:werkzeug: * Debugger PIN: 593-560-539
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:17:59] "[32mGET / HTTP/1.1[0m" 302 -
+INFO:app:Home
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:17:59] "GET /home HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:18:00] "GET /static/css/custom.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:18:00] "[36mGET /profilephotos/Sector-7.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:18:00] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:18:03] "GET /platform-agreement HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:18:03] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:18:03] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Home
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:18:14] "GET /home HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:18:14] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:18:14] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:18:14] "[36mGET /profilephotos/Sector-7.png HTTP/1.1[0m" 304 -
+INFO:app:Products for rent
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:18:18] "GET /products HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:18:18] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:18:18] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:18:20] "GET /create-listing HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:18:20] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:18:21] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:23:31] "GET /platform-agreement HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:23:31] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:23:31] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:01] "[32mGET / HTTP/1.1[0m" 302 -
+INFO:app:Home
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:01] "GET /home HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:01] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:01] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:01] "[36mGET /profilephotos/Sector-7.png HTTP/1.1[0m" 304 -
+INFO:app:Log out
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:05] "[32mGET /logout HTTP/1.1[0m" 302 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:05] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:06] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:06] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:08] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:09] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:09] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:19] "[32mPOST / HTTP/1.1[0m" 302 -
+INFO:app:Admin
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:19] "GET /admin HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:19] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:19] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:23] "[32mPOST /admin HTTP/1.1[0m" 302 -
+INFO:app:Admin
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:23] "GET /admin HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:23] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:23] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Log out
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:40] "[32mGET /logout HTTP/1.1[0m" 302 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:40] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:40] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:41] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:43] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:43] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:43] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:55] "[32mPOST / HTTP/1.1[0m" 302 -
+INFO:app:Home
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:55] "GET /home HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:55] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:28:55] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Products for rent
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:29:03] "GET /products HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:29:03] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:29:04] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Home
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:29:08] "GET /home HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:29:09] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:29:09] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:29:20] "GET /create-listing HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:29:21] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [21/Aug/2026 13:29:21] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug: * Detected change in "c:\\Users\\S7137301\\OneDrive - St Joseph's College, Gregory Terrace\\2026\\Digital Solutions\\Term 3\\Basic-Flask-Template\\app.py", reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 593-560-539
+INFO:werkzeug: * Detected change in "c:\\Users\\S7137301\\OneDrive - St Joseph's College, Gregory Terrace\\2026\\Digital Solutions\\Term 3\\Basic-Flask-Template\\app.py", reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 593-560-539
+INFO:app:Login
+INFO:app:Login
+INFO:app:Register
+INFO:werkzeug: * Detected change in "c:\\Users\\S7137301\\OneDrive - St Joseph's College, Gregory Terrace\\2026\\Digital Solutions\\Term 3\\Basic-Flask-Template\\app.py", reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 593-560-539

@@ -2,19 +2,22 @@
 {% block content %}
     <h2>List Hardware</h2>
     <p class="text-muted">Offer your idle compute power to marketplace buyers.</p>
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 
     <form action="/create-listing" method="POST" class="row g-3">
-        <div class="col-12">
-            <label for="title" class="form-label">Title</label>
-            <input type="text" class="form-control" id="title" name="title" required>
+        <div class="col-md-6">
+            <label for="cpu_preset" class="form-label">CPU</label>
+            <select class="form-select" id="cpu_preset" name="cpu_preset" required>
+                {% for name, rate in hardware_rates['CPUs'].items() %}<option value="{{ name }}">{{ name }}{% if rate %} (${{ '%.2f'|format(rate) }}/hr){% endif %}</option>{% endfor %}
+            </select>
+            <input type="text" class="form-control mt-2 d-none" id="custom_cpu" name="custom_cpu" placeholder="Custom CPU name">
         </div>
         <div class="col-md-6">
-            <label for="hardware_type" class="form-label">Hardware Type</label>
-            <select class="form-select" id="hardware_type" name="hardware_type" required>
-                <option value="PC">PC</option>
-                <option value="GPU">GPU</option>
-                <option value="Server">Server</option>
+            <label for="gpu_preset" class="form-label">GPU</label>
+            <select class="form-select" id="gpu_preset" name="gpu_preset" required>
+                {% for name, rate in hardware_rates['GPUs'].items() %}<option value="{{ name }}">{{ name }}{% if rate %} (${{ '%.2f'|format(rate) }}/hr){% endif %}</option>{% endfor %}
             </select>
+            <input type="text" class="form-control mt-2 d-none" id="custom_gpu" name="custom_gpu" placeholder="Custom GPU name">
         </div>
         <div class="col-md-3">
             <label for="ram_gb" class="form-label">RAM (GB)</label>
@@ -23,6 +26,7 @@
         <div class="col-md-3">
             <label for="hourly_price" class="form-label">Hourly Price ($)</label>
             <input type="number" class="form-control" id="hourly_price" name="hourly_price" min="0" step="0.01" required>
+            <span class="badge text-bg-light mt-2" id="recommended-rate">Recommended Rate: $0.00/hr based on selected hardware.</span>
         </div>
         <div class="col-md-4 form-check ms-2">
             <input type="checkbox" class="form-check-input" id="enterprise_only" name="enterprise_only">
@@ -50,6 +54,29 @@
 {% endblock %}
 {% block scripts %}
 <script>
+    var hardwareRates = {{ hardware_rates|tojson }};
+    var cpuSelect = document.getElementById('cpu_preset');
+    var gpuSelect = document.getElementById('gpu_preset');
+    var customCpu = document.getElementById('custom_cpu');
+    var customGpu = document.getElementById('custom_gpu');
+    var hourlyPrice = document.getElementById('hourly_price');
+    var recommendation = document.getElementById('recommended-rate');
+    function toggleCustom(select, input) {
+        input.classList.toggle('d-none', select.value !== ('Custom ' + select.id.split('_')[0].toUpperCase()));
+        input.required = select.value === ('Custom ' + select.id.split('_')[0].toUpperCase());
+    }
+    function updateRecommendation() {
+        var cpuRate = hardwareRates.CPUs[cpuSelect.value] || 0;
+        var gpuRate = hardwareRates.GPUs[gpuSelect.value] || 0;
+        var recommended = cpuRate + gpuRate;
+        recommendation.textContent = 'Recommended Rate: $' + recommended.toFixed(2) + '/hr based on selected hardware.';
+        if (!hourlyPrice.dataset.edited) hourlyPrice.value = recommended.toFixed(2);
+    }
+    [cpuSelect, gpuSelect].forEach(function (select) { select.addEventListener('change', function () {
+        toggleCustom(cpuSelect, customCpu); toggleCustom(gpuSelect, customGpu); updateRecommendation();
+    }); });
+    hourlyPrice.addEventListener('input', function () { hourlyPrice.dataset.edited = 'true'; });
+    toggleCustom(cpuSelect, customCpu); toggleCustom(gpuSelect, customGpu); updateRecommendation();
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.map(function (el) { return new bootstrap.Tooltip(el); });
 </script>

@@ -24,6 +24,23 @@ def allowed_file(filename):
 
 DATABASE = Database("database/test.db", app.logger)
 
+HARDWARE_RATES = {
+    'GPUs': {
+        'NVIDIA RTX 4090': 0.80,
+        'RTX 3080': 0.35,
+        'NVIDIA A100': 1.80,
+        'NVIDIA H100': 3.20,
+        'Custom GPU': 0.00,
+    },
+    'CPUs': {
+        'AMD Ryzen 9 7950X': 0.30,
+        'Intel Core i9-14900K': 0.28,
+        'AMD Threadripper PRO': 0.90,
+        'Intel Xeon Platinum': 1.10,
+        'Custom CPU': 0.00,
+    },
+}
+
 #---VIEW FUNCTIONS----------------------------------------------------
 @app.route('/init-db')
 def init_db():
@@ -100,16 +117,24 @@ def create_listing():
         return redirect('./')
 
     if request.method == 'POST':
+        cpu_preset = request.form.get('cpu_preset', 'Custom CPU')
+        gpu_preset = request.form.get('gpu_preset', 'Custom GPU')
+        cpu_name = request.form.get('custom_cpu', '').strip() if cpu_preset == 'Custom CPU' else cpu_preset
+        gpu_name = request.form.get('custom_gpu', '').strip() if gpu_preset == 'Custom GPU' else gpu_preset
+        if not cpu_name or not gpu_name:
+            return render_template('create_listing.html', hardware_rates=HARDWARE_RATES,
+                                   error='Enter a name for each custom hardware component.'), 400
+        hardware_title = gpu_name + ' + ' + cpu_name
         DATABASE.ModifyQuery(
             "INSERT INTO listings (sellerid, title, hardware_type, ram_gb, hourly_price, enterprise_only, benchmark_score, allow_failover, absorb_failovers) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (session['userid'], request.form['title'], request.form['hardware_type'],
+            (session['userid'], hardware_title, 'CPU + GPU',
              int(request.form['ram_gb']), float(request.form['hourly_price']),
              int(request.form.get('enterprise_only', 0)), int(request.form.get('benchmark_score', 100)),
              int(request.form.get('allow_failover', 1)), int(request.form.get('absorb_failovers', 0)))
         )
         return redirect('./products')
 
-    return render_template('create_listing.html')
+    return render_template('create_listing.html', hardware_rates=HARDWARE_RATES)
 
 @app.route('/logout')
 def logout():
@@ -370,7 +395,7 @@ def login():
             message = "User does not exist, email is incorrect!!"
 
     if request.method == "GET":
-        return render_template("landing.html")
+        return render_template("landing.html", hardware_rates=HARDWARE_RATES)
     return render_template("login.html", message=message)
 
 @app.route('/register', methods=['GET','POST'])
