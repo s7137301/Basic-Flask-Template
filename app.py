@@ -76,6 +76,17 @@ def init_db():
 def init_full_db():
     init_db()
     DATABASE.ModifyQuery("""
+        CREATE TABLE IF NOT EXISTS notifications (
+            id INTEGER PRIMARY KEY,
+            userid INTEGER,
+            message TEXT,
+            type TEXT,
+            is_read INTEGER DEFAULT 0,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(userid) REFERENCES users(userid)
+        )
+    """)
+    DATABASE.ModifyQuery("""
         CREATE TABLE IF NOT EXISTS ratings (
             ratingid INTEGER PRIMARY KEY AUTOINCREMENT,
             agreementid INTEGER NOT NULL,
@@ -93,6 +104,7 @@ def init_full_db():
         ("users", "company_name", "TEXT"),
         ("users", "enterprise_status", "TEXT DEFAULT 'none'"),
         ("users", "rating", "REAL DEFAULT 5.0"),
+        ("users", "account_status", "TEXT DEFAULT 'active'"),
         ("listings", "enterprise_only", "INTEGER DEFAULT 0"),
         ("listings", "benchmark_score", "INTEGER DEFAULT 100"),
         ("listings", "allow_failover", "INTEGER DEFAULT 1"),
@@ -110,6 +122,27 @@ def init_full_db():
         if not existing_columns or column not in {row['name'] for row in existing_columns}:
             DATABASE.ModifyQuery("ALTER TABLE " + table + " ADD COLUMN " + column + " " + definition)
     return "Full marketplace database schema is ready."
+
+@app.context_processor
+def inject_notifications():
+    if 'userid' not in session:
+        return {'unread_notifications': [], 'unread_notification_count': 0}
+    notifications = DATABASE.ViewQuery(
+        "SELECT id, message, type, timestamp FROM notifications WHERE userid = ? AND is_read = 0 ORDER BY timestamp DESC LIMIT 5",
+        (session['userid'],)) or []
+    return {'unread_notifications': notifications, 'unread_notification_count': len(notifications)}
+
+@app.route('/api/notifications', methods=['GET', 'POST'])
+def notifications_api():
+    if 'userid' not in session:
+        return jsonify({'status': 'error', 'message': 'Login required.'}), 401
+    if request.method == 'POST':
+        DATABASE.ModifyQuery("UPDATE notifications SET is_read = 1 WHERE userid = ? AND is_read = 0", (session['userid'],))
+        return jsonify({'status': 'success'})
+    notifications = DATABASE.ViewQuery(
+        "SELECT id, message, type, timestamp FROM notifications WHERE userid = ? ORDER BY timestamp DESC LIMIT 10",
+        (session['userid'],)) or []
+    return jsonify({'notifications': notifications})
 
 @app.route('/create-listing', methods=['GET', 'POST'])
 def create_listing():
@@ -151,10 +184,13 @@ def admin():
         if session['permission'] != 'admin':
             return redirect("./")
 
-    results = DATABASE.ViewQuery("SELECT * FROM users") or []
+    results = DATABASE.ViewQuery("SELECT userid, firstname, lastname, permission, enterprise_status, account_status FROM users ORDER BY userid") or []
     enterprise_requests = DATABASE.ViewQuery(
         "SELECT userid, firstname, lastname, email, company_name, enterprise_status FROM users WHERE enterprise_status = 'pending'"
     ) or []
+    total_users = DATABASE.ViewQuery("SELECT COUNT(*) AS total FROM users")
+    active_rentals = DATABASE.ViewQuery("SELECT COUNT(*) AS total FROM agreements WHERE status = 'active'")
+    pending_enterprise = DATABASE.ViewQuery("SELECT COUNT(*) AS total FROM users WHERE enterprise_status = 'pending'")
 
     if request.method == "POST":
         approve_id = request.form.get('approve_enterprise')
@@ -176,7 +212,30 @@ def admin():
         return redirect("./admin")
 
     app.logger.info("Admin")
-    return render_template("admin.html", results=results, enterprise_requests=enterprise_requests)
+    return render_template("admin.html", results=results, enterprise_requests=enterprise_requests,
+                           total_users=total_users[0]['total'] if total_users else 0,
+                           active_rental_count=active_rentals[0]['total'] if active_rentals else 0,
+                           pending_enterprise_count=pending_enterprise[0]['total'] if pending_enterprise else 0)
+
+@app.route('/admin/user/<int:userid>/suspend', methods=['POST'])
+def suspend_user(userid):
+    if session.get('permission') != 'admin':
+        return redirect('./')
+    DATABASE.ModifyQuery("UPDATE users SET account_status = 'suspended' WHERE userid = ?", (userid,))
+    return redirect('/admin')
+
+@app.route('/admin/user/<int:userid>/verify', methods=['POST'])
+def verify_user(userid):
+    if session.get('permission') != 'admin':
+        return redirect('./')
+    DATABASE.ModifyQuery("UPDATE users SET account_status = 'active' WHERE userid = ?", (userid,))
+    return redirect('/admin')
+
+@app.route('/security')
+def security():
+    if 'userid' not in session:
+        return redirect('./')
+    return render_template('security.html')
 
 @app.route('/home')
 def home():
@@ -204,6 +263,20 @@ def home():
     reliability = DATABASE.ViewQuery(
         "SELECT COALESCE(AVG(CASE WHEN hours = 0 THEN 100.0 ELSE completed_hours * 100.0 / hours END), 100.0) AS score FROM agreements WHERE buyerid = ?",
         (session['userid'],))
+    activity_history = DATABASE.ViewQuery("""
+        SELECT date('now') AS activity_date, listings.title || ' rental' AS activity_type,
+               agreements.total_cost AS amount, agreements.status AS raw_status
+        FROM agreements JOIN listings ON agreements.listingid = listings.listingid
+        WHERE agreements.buyerid = ?
+        UNION ALL
+        SELECT date('now') AS activity_date, listings.title || ' rental' AS activity_type,
+               agreements.seller_payout AS amount, agreements.status AS raw_status
+        FROM agreements JOIN listings ON agreements.listingid = listings.listingid
+        WHERE listings.sellerid = ?
+        ORDER BY activity_date DESC
+    """, (session['userid'], session['userid'])) or []
+    for activity in activity_history:
+        activity['status'] = 'Active' if activity['raw_status'] == 'active' else ('Refunded' if activity['raw_status'] == 'refunded' else 'Complete')
     dashboard = {
         'active_rentals': active_rentals,
         'total_earnings': earnings[0]['total'] if earnings else 0,
@@ -211,6 +284,7 @@ def home():
         'reliability_score': reliability[0]['score'] if reliability else 100,
         'listings_count': listings_count[0]['total'] if listings_count else 0,
         'enterprise_pending': user.get('enterprise_status') == 'pending',
+        'activity_history': activity_history,
     }
     app.logger.info("Home")
     template = "enterprise_dashboard.html" if user.get('is_enterprise') == 1 else "home.html"
@@ -224,10 +298,45 @@ def products_for_rent():
 
     buyer = DATABASE.ViewQuery("SELECT is_enterprise, enterprise_status FROM users WHERE userid = ?", (session['userid'],))
     enterprise_access = 1 if buyer and buyer[0].get('is_enterprise') == 1 and buyer[0].get('enterprise_status') == 'approved' else 0
-    listings = DATABASE.ViewQuery("SELECT listings.*, users.firstname FROM listings JOIN users ON listings.sellerid = users.userid WHERE listings.status = 'available' AND (listings.enterprise_only = 0 OR listings.enterprise_only = ?)", (enterprise_access,))
+    sort_by = request.args.get('sort', 'cheapest')
+    cpu_type = request.args.get('cpu', '').strip()
+    gpu_type = request.args.get('gpu', '').strip()
+    max_price = request.args.get('max_price', '').strip()
+    query = "SELECT listings.*, users.firstname, users.rating AS seller_rating FROM listings JOIN users ON listings.sellerid = users.userid WHERE (listings.enterprise_only = 0 OR listings.enterprise_only = ?)"
+    params = [enterprise_access]
+    if cpu_type:
+        query += " AND listings.title LIKE ?"
+        params.append('%' + cpu_type + '%')
+    if gpu_type:
+        query += " AND listings.title LIKE ?"
+        params.append('%' + gpu_type + '%')
+    if max_price:
+        try:
+            float(max_price)
+            query += " AND listings.hourly_price <= ?"
+            params.append(max_price)
+        except ValueError:
+            max_price = ''
+    query += " ORDER BY " + ("seller_rating DESC" if sort_by == 'highest_rated' else "listings.hourly_price ASC")
+    listings = DATABASE.ViewQuery(query, tuple(params))
     active_agreements = DATABASE.ViewQuery("SELECT agreements.* FROM agreements WHERE agreements.buyerid = ? AND agreements.status = 'active' ORDER BY agreements.agreementid DESC LIMIT 1", (session['userid'],))
     app.logger.info("Products for rent")
-    return render_template("products.html", listings=listings or [], active_agreement=active_agreements[0] if active_agreements else None)
+    return render_template("products.html", listings=listings or [], active_agreement=active_agreements[0] if active_agreements else None,
+                           sort_by=sort_by, cpu_type=cpu_type, gpu_type=gpu_type, max_price=max_price)
+
+@app.route('/status')
+def status():
+    return render_template('status.html')
+
+@app.route('/seller/<int:seller_id>')
+def seller_profile(seller_id):
+    sellers = DATABASE.ViewQuery("SELECT * FROM users WHERE userid = ?", (seller_id,))
+    if not sellers:
+        return "Seller not found.", 404
+    listings = DATABASE.ViewQuery("SELECT * FROM listings WHERE sellerid = ? AND status = 'available' ORDER BY listingid DESC", (seller_id,)) or []
+    completed = DATABASE.ViewQuery("SELECT COUNT(*) AS total FROM agreements JOIN listings ON agreements.listingid = listings.listingid WHERE listings.sellerid = ? AND agreements.status != 'active'", (seller_id,))
+    return render_template('seller_profile.html', seller=sellers[0], listings=listings,
+                           completed_jobs=completed[0]['total'] if completed else 0)
 
 @app.route('/checkout/<int:listing_id>', methods=['GET', 'POST'])
 def checkout(listing_id):

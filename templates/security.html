@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div><p class="text-uppercase text-muted mb-1">Account protection</p><h2>Security &amp; 2FA</h2></div>
+    <span class="security-status">Account protected</span>
+</div>
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="card p-4 security-panel">
+            <h3>Two-Factor Authentication</h3>
+            <p class="text-muted">Add a second verification step to protect your marketplace account.</p>
+            <p><strong>Status:</strong> <span class="badge text-bg-secondary">Disabled</span></p>
+            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#twoFactorModal">Enable 2FA</button>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="card p-4 security-panel">
+            <div class="d-flex justify-content-between align-items-center"><h3>Recent Sessions</h3><button class="btn btn-danger btn-sm" type="button">Logout All Other Devices</button></div>
+            <div class="responsive-table mt-3"><table class="table align-middle"><thead><tr><th>Device</th><th>Location</th><th>IP Address</th><th>Date</th></tr></thead><tbody>
+                <tr><td>Chrome - Windows 11</td><td>Brisbane, QLD</td><td>203.0.113.42</td><td>26 Aug 2026, 10:42 AM</td></tr>
+                <tr><td>Safari - iPhone</td><td>Brisbane, QLD</td><td>203.0.113.57</td><td>25 Aug 2026, 6:18 PM</td></tr>
+                <tr><td>Edge - Windows 11</td><td>Toowoomba, QLD</td><td>198.51.100.18</td><td>22 Aug 2026, 9:05 AM</td></tr>
+            </tbody></table></div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="twoFactorModal" tabindex="-1" aria-labelledby="twoFactorLabel" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h3 class="modal-title" id="twoFactorLabel">Set up 2FA</h3><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+        <div class="modal-body text-center"><p>Scan this mock QR code with your authenticator app.</p><div class="mock-qr" aria-label="Mock QR code"></div><label class="form-label text-start w-100 mt-3" for="two-factor-code">Authentication code</label><input class="form-control" id="two-factor-code" type="text" inputmode="numeric" placeholder="Enter six-digit code"></div>
+        <div class="modal-footer"><button class="btn btn-primary" type="button" data-bs-dismiss="modal">Verify and enable</button></div>
+    </div></div>
+</div>
+{% endblock %}

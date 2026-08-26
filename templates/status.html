@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="status-page">
+    <p class="text-uppercase text-muted">Infrastructure overview</p>
+    <h2>Platform Status</h2>
+    <p class="text-muted">All core marketplace services are operating normally.</p>
+    <div class="row g-3 mt-3">
+        <div class="col-md-6"><div class="status-service"><span class="health-dot">&#128994;</span><div><strong>Compute Marketplace</strong><span>Operational</span></div></div></div>
+        <div class="col-md-6"><div class="status-service"><span class="health-dot">&#128994;</span><div><strong>Escrow Payments</strong><span>Operational</span></div></div></div>
+        <div class="col-md-6"><div class="status-service"><span class="health-dot">&#128994;</span><div><strong>Compute Nodes</strong><span>99.8% Uptime</span></div></div></div>
+        <div class="col-md-6"><div class="status-service"><span class="health-dot">&#128994;</span><div><strong>SLA Failover API</strong><span>Operational</span></div></div></div>
+    </div>
+</section>
+{% endblock %}

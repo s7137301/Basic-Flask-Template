@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="seller-profile">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        {% if seller['profilephoto'] %}<img class="seller-avatar" src="/profilephotos/{{ seller['profilephoto'] }}" alt="{{ seller['firstname'] }} profile photo">{% else %}<div class="seller-avatar seller-avatar-placeholder">{{ seller['firstname'][0] }}</div>{% endif %}
+        <div><p class="text-uppercase text-muted mb-1">Verified compute provider</p><h2 class="mb-1">{{ seller['firstname'] }} {{ seller['lastname'] }}</h2><p class="mb-0 seller-rating">{{ '%.1f'|format(seller['rating'] or 5) }} &#9733; aggregate rating</p></div>
+    </div>
+    <div class="row g-3 mb-4">
+        <div class="col-md-4"><div class="card p-3"><small>Aggregate rating</small><strong class="fs-3">{{ '%.1f'|format(seller['rating'] or 5) }} &#9733;</strong></div></div>
+        <div class="col-md-4"><div class="card p-3"><small>Completed jobs</small><strong class="fs-3">{{ completed_jobs }}</strong></div></div>
+        <div class="col-md-4"><div class="card p-3"><small>Available machines</small><strong class="fs-3">{{ listings|length }}</strong></div></div>
+    </div>
+    <h3>Available compute machines</h3>
+    <div class="row g-4 mt-1">
+        {% for listing in listings %}<div class="col-md-6 col-lg-4"><div class="card h-100"><div class="card-body"><h5>{{ listing['title'] }}</h5><p>{{ listing['hardware_type'] }} · {{ listing['ram_gb'] }} GB RAM</p><p class="fs-5">${{ '%.2f'|format(listing['hourly_price']) }} / hour</p><a class="btn btn-success" href="/checkout/{{ listing['listingid'] }}">Rent Hardware</a></div></div></div>{% else %}<p class="alert alert-info">This seller has no available machines right now.</p>{% endfor %}
+    </div>
+</section>
+{% endblock %}

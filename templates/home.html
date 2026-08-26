@@ -9,6 +9,10 @@
         <div class="col-md-4"><div class="card p-3"><small>Total earnings</small><strong class="fs-3">${{ '%.2f'|format(total_earnings) }}</strong></div></div>
         <div class="col-md-4"><div class="card p-3"><small>Escrow balance</small><strong class="fs-3">${{ '%.2f'|format(escrow_balance) }}</strong></div></div>
     </div>
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6"><div class="card p-3 chart-card"><h3>Seller earnings</h3><canvas id="earningsChart"></canvas></div></div>
+        <div class="col-lg-6"><div class="card p-3 chart-card"><h3>Buyer compute usage</h3><canvas id="usageChart"></canvas></div></div>
+    </div>
     {% if listings_count == 0 %}
         <div class="alert alert-info">You haven't listed any hardware yet! Turn your idle PC power into revenue.<br><a class="btn btn-primary mt-2" href="/create-listing">List Your Compute</a></div>
     {% endif %}
@@ -20,6 +24,19 @@
         {% for rental in active_rentals %}<tr><td><a href="/agreement/{{ rental['agreementid'] }}">#{{ rental['agreementid'] }}</a></td><td>{{ rental['title'] }}</td><td>{{ rental['hours'] }}</td><td>{{ rental['escrow_status'] }}</td></tr>{% endfor %}
         </tbody></table></div>
     {% endif %}
+    <section class="mt-5">
+        <h3>Activity History</h3>
+        {% if activity_history %}<div class="responsive-table"><table class="table align-middle"><thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Status</th></tr></thead><tbody>
+            {% for activity in activity_history %}<tr><td>{{ activity['activity_date'] }}</td><td>{{ activity['activity_type'] }}</td><td>${{ '%.2f'|format(activity['amount'] or 0) }}</td><td><span class="activity-status activity-{{ activity['status']|lower }}">{{ activity['status'] }}</span></td></tr>{% endfor %}
+        </tbody></table></div>{% else %}<p class="alert alert-light">No activity history yet.</p>{% endif %}
+    </section>
     {% include "profilephoto.html" %}
 
+{% endblock %}
+{% block scripts %}
+<script>
+    var chartLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    new Chart(document.getElementById('earningsChart'), { type: 'line', data: { labels: chartLabels, datasets: [{ label: 'Earnings ($)', data: [12, 18, 14, 25, 22, 31, 28], borderColor: '#6f42c1', backgroundColor: 'rgba(111, 66, 193, 0.16)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
+    new Chart(document.getElementById('usageChart'), { type: 'line', data: { labels: chartLabels, datasets: [{ label: 'Compute hours', data: [3, 5, 4, 8, 7, 10, 9], borderColor: '#4338ca', backgroundColor: 'rgba(67, 56, 202, 0.14)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
+</script>
 {% endblock %}

@@ -1,8 +1,19 @@
 {% extends "layout.html" %}
 {% block content %}
-    <h2>Admin</h2>
+    <h2>Admin Dashboard</h2>
 
     <p>Welcome {{session['name']}}</p>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4"><div class="card metric-card p-3"><small>Total users</small><strong class="fs-2">{{ total_users }}</strong></div></div>
+        <div class="col-md-4"><div class="card metric-card p-3"><small>Active rentals</small><strong class="fs-2">{{ active_rental_count }}</strong></div></div>
+        <div class="col-md-4"><div class="card metric-card p-3"><small>Pending enterprise applications</small><strong class="fs-2">{{ pending_enterprise_count }}</strong></div></div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-lg-7"><div class="card chart-card p-3"><h3>Platform revenue</h3><canvas id="revenueChart"></canvas></div></div>
+        <div class="col-lg-5"><div class="card chart-card p-3"><h3>Active jobs</h3><canvas id="jobsChart"></canvas></div></div>
+    </div>
 
     <section class="mb-5">
         <h3>Enterprise Verification Queue</h3>
@@ -18,34 +29,29 @@
         {% else %}<p class="alert alert-info">No enterprise applications are awaiting review.</p>{% endif %}
     </section>
 
-    {% if results %}
-    <form action="/admin" method="POST">
-        <table class="table usertable">
-
-            <tr>
-                <!-- Get all the keys of the first python dictionary as column headings -->
-                {% for columnname in results[0].keys() %}
-                    <th>{{columnname}}</th>
-                {% endfor %}
-                    <th>delete ?</th>
-            </tr>
-
-            {% for row in results %}
-                <tr>
-                    {% for cell in row.values() %}
-                        <td>{{cell}}</td>
-                    {% endfor %}
-                    <td><input type="checkbox" name="selectedusers" value="{{row['userid']}}"></td>
-                </tr>
-            {% endfor %}
-        </table>
-    {% endif %}
-        <input type="Submit" value="Delete users">
-    </form>
+    <h3>User Management</h3>
+    <div class="responsive-table mb-4"><table class="table usertable align-middle">
+        <thead><tr><th>Name</th><th>Permission</th><th>Enterprise Status</th><th>Account Status</th><th>Actions</th><th>Delete</th></tr></thead>
+        <tbody>{% for row in results %}
+            <tr><td>{{ row['firstname'] }} {{ row['lastname'] }}</td><td>{{ row['permission'] }}</td><td>{{ row['enterprise_status'] or 'none' }}</td><td>{{ row['account_status'] or 'active' }}</td><td>
+                <form action="/admin/user/{{ row['userid'] }}/suspend" method="POST" class="d-inline"><button class="btn btn-sm btn-outline-danger" type="submit">Suspend</button></form>
+                <form action="/admin/user/{{ row['userid'] }}/verify" method="POST" class="d-inline"><button class="btn btn-sm btn-outline-success" type="submit">Verify</button></form>
+            </td><td><input type="checkbox" name="selectedusers" value="{{row['userid']}}" form="delete-users"></td></tr>
+        {% else %}<tr><td colspan="6">No users found.</td></tr>{% endfor %}</tbody>
+    </table></div>
+    <form id="delete-users" action="/admin" method="POST"><button class="btn btn-secondary" type="submit">Delete selected users</button></form>
 
     <br>
     <form action="/backdoor" method="POST">
         <input type="Submit" value="Hash passwords">
     </form>
 
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var adminLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    new Chart(document.getElementById('revenueChart'), { type: 'line', data: { labels: adminLabels, datasets: [{ label: 'Revenue ($)', data: [84, 102, 96, 126, 143, 137, 168], borderColor: '#6f42c1', backgroundColor: 'rgba(111, 66, 193, 0.16)', fill: true, tension: 0.35 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
+    new Chart(document.getElementById('jobsChart'), { type: 'bar', data: { labels: adminLabels, datasets: [{ label: 'Active jobs', data: [8, 11, 9, 14, 16, 19, 17], backgroundColor: '#4338ca', borderRadius: 5 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
+</script>
 {% endblock %}

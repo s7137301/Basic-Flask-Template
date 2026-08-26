@@ -9,23 +9,49 @@
     </div>
 
     <div class="row g-4">
+        <aside class="col-md-3">
+            <div class="card p-3 filter-panel">
+                <h3>Filters &amp; Sort</h3>
+                <form method="GET" action="/products">
+                    <label class="form-label" for="sort">Sort By</label>
+                    <select class="form-select mb-3" id="sort" name="sort">
+                        <option value="cheapest" {% if sort_by == 'cheapest' %}selected{% endif %}>Cheapest</option>
+                        <option value="highest_rated" {% if sort_by == 'highest_rated' %}selected{% endif %}>Highest Rated</option>
+                    </select>
+                    <label class="form-label" for="cpu">CPU Type</label>
+                    <input class="form-control mb-3" id="cpu" name="cpu" value="{{ cpu_type }}" placeholder="e.g. Ryzen 9">
+                    <label class="form-label" for="gpu">GPU Type</label>
+                    <input class="form-control mb-3" id="gpu" name="gpu" value="{{ gpu_type }}" placeholder="e.g. RTX 4090">
+                    <label class="form-label" for="max_price">Max Price / hour</label>
+                    <input class="form-control mb-3" id="max_price" name="max_price" type="number" min="0" step="0.01" value="{{ max_price }}">
+                    <button class="btn btn-primary w-100" type="submit">Apply Filters</button>
+                </form>
+            </div>
+        </aside>
+        <div class="col-md-9">
+        <div class="row g-4">
         {% for listing in listings %}
             <div class="col-md-6 col-lg-4">
-                <div class="card h-100 shadow-sm">
+                <div class="card h-100 shadow-sm" data-title="{{ listing['title'] }}" data-hardware="{{ listing['hardware_type'] }} · {{ listing['ram_gb'] }} GB RAM" data-performance="{{ listing['benchmark_score'] }} benchmark" data-price="${{ '%.2f'|format(listing['hourly_price']) }}/hr" data-status="{{ listing['status'] }}" data-rating="{{ '%.1f'|format(listing['seller_rating'] or 5) }} &#9733;">
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title">{{ listing['title'] }}</h5>
+                        <label class="compare-control"><input class="compare-checkbox" type="checkbox"> Compare</label>
+                        <a class="seller-link" href="/seller/{{ listing['sellerid'] }}">{{ listing['firstname'] }} · {{ '%.1f'|format(listing['seller_rating'] or 5) }} &#9733;</a>
+                        {% if listing['status'] == 'available' %}<span class="live-status available">&#128994; Available Now</span>{% elif listing['status'] in ['rented', 'offloaded'] %}<span class="live-status busy">&#128993; Busy</span>{% else %}<span class="live-status offline">&#128308; Offline</span>{% endif %}
                         {% if listing['absorb_failovers'] == 1 %}<span class="status-badge status-available mb-2">SLA Failover Node</span>{% endif %}
                         <p class="card-text mb-1"><strong>Type:</strong> {{ listing['hardware_type'] }}</p>
                         <p class="card-text mb-1"><strong>RAM:</strong> {{ listing['ram_gb'] }} GB</p>
                         <p class="card-text mb-3"><strong>Seller:</strong> {{ listing['firstname'] }}</p>
                         <p class="fs-5 mt-auto">${{ '%.2f'|format(listing['hourly_price']) }} / hour</p>
-                        <a href="/checkout/{{ listing['listingid'] }}" class="btn btn-success">Rent Hardware</a>
+                        {% if listing['status'] == 'available' %}<a href="/checkout/{{ listing['listingid'] }}" class="btn btn-success">Rent Hardware</a>{% else %}<button class="btn btn-outline-secondary" type="button" disabled>Currently unavailable</button>{% endif %}
                     </div>
                 </div>
             </div>
         {% else %}
             <div class="col-12"><p class="alert alert-info">No hardware is currently available.</p></div>
         {% endfor %}
+        </div>
+        </div>
     </div>
 
     <hr class="my-5">
@@ -34,6 +60,9 @@
         <button type="button" class="btn btn-outline-secondary" id="run-task">Run test job</button>
         <pre id="task-output" class="mt-3 p-3 bg-light">Ready to run.</pre>
     </section>
+
+    <div id="compare-bar" class="compare-bar" hidden><span><strong id="compare-count">0</strong> selected</span><button class="btn btn-primary btn-sm" id="compare-button" type="button">Compare <span id="compare-button-count">0</span> Selected</button><button class="btn btn-link btn-sm" id="clear-compare" type="button">Clear</button></div>
+    <div class="modal fade" id="comparisonModal" tabindex="-1" aria-labelledby="comparison-title" aria-hidden="true"><div class="modal-dialog modal-xl"><div class="modal-content"><div class="modal-header"><h3 class="modal-title" id="comparison-title">Machine Comparison</h3><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><div class="responsive-table"><table class="table comparison-table"><tbody id="comparison-body"></tbody></table></div></div></div></div></div>
 
     {% if active_agreement %}
     <section class="mt-5" aria-labelledby="failover-heading">
@@ -72,5 +101,24 @@
             }, new FormData(failoverForm), 'POST');
         });
     }
+    var compareBar = document.getElementById('compare-bar');
+    var compareChecks = document.querySelectorAll('.compare-checkbox');
+    function selectedChecks() { return Array.from(compareChecks).filter(function (check) { return check.checked; }); }
+    function updateCompareBar() {
+        var selected = selectedChecks();
+        document.getElementById('compare-count').textContent = selected.length;
+        document.getElementById('compare-button-count').textContent = selected.length;
+        compareBar.hidden = selected.length === 0;
+        compareChecks.forEach(function (check) { check.disabled = !check.checked && selected.length >= 3; });
+    }
+    compareChecks.forEach(function (check) { check.addEventListener('change', updateCompareBar); });
+    document.getElementById('clear-compare').addEventListener('click', function () { compareChecks.forEach(function (check) { check.checked = false; }); updateCompareBar(); });
+    document.getElementById('compare-button').addEventListener('click', function () {
+        var selected = selectedChecks();
+        var fields = ['Hardware', 'Performance', 'Hourly Price', 'Availability Status', 'Seller Rating'];
+        var rows = fields.map(function (field) { return '<tr><th>' + field + '</th>' + selected.map(function (check) { var card = check.closest('.card'); var key = {'Hardware': 'hardware', 'Performance': 'performance', 'Hourly Price': 'price', 'Availability Status': 'status', 'Seller Rating': 'rating'}[field]; return '<td>' + card.dataset[key] + '</td>'; }).join('') + '</tr>'; }).join('');
+        document.getElementById('comparison-body').innerHTML = '<tr><th>Machine</th>' + selected.map(function (check) { return '<th>' + check.closest('.card').dataset.title + '</th>'; }).join('') + '</tr>' + rows;
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('comparisonModal')).show();
+    });
 </script>
 {% endblock %}
