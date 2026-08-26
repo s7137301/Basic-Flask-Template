@@ -129,8 +129,8 @@ def create_listing():
             "INSERT INTO listings (sellerid, title, hardware_type, ram_gb, hourly_price, enterprise_only, benchmark_score, allow_failover, absorb_failovers) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (session['userid'], hardware_title, 'CPU + GPU',
              int(request.form['ram_gb']), float(request.form['hourly_price']),
-             int(request.form.get('enterprise_only', 0)), int(request.form.get('benchmark_score', 100)),
-             int(request.form.get('allow_failover', 1)), int(request.form.get('absorb_failovers', 0)))
+             int(request.form.get('enterprise_only') == 'on'), int(request.form.get('benchmark_score', 100)),
+             int(request.form.get('allow_failover') == 'on'), int(request.form.get('absorb_failovers') == 'on'))
         )
         return redirect('./products')
 
