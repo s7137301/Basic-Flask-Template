@@ -10,8 +10,8 @@
     <div class="col-md-3"><div class="card p-3"><small>SLA reliability</small><strong class="fs-3">{{ '%.1f'|format(reliability_score) }}%</strong></div></div>
 </div>
 <div class="row g-4 mb-4">
-    <div class="col-lg-6"><div class="card p-3 chart-card"><h3>Seller earnings</h3><canvas id="earningsChart"></canvas></div></div>
-    <div class="col-lg-6"><div class="card p-3 chart-card"><h3>Buyer compute usage</h3><canvas id="usageChart"></canvas></div></div>
+    <div class="col-lg-6"><div class="card p-3 chart-card"><h3>Seller earnings</h3><div class="chart-container" style="position: relative; height: 300px; width: 100%;"><canvas id="earningsChart"></canvas></div></div></div>
+    <div class="col-lg-6"><div class="card p-3 chart-card"><h3>Buyer compute usage</h3><div class="chart-container" style="position: relative; height: 300px; width: 100%;"><canvas id="usageChart"></canvas></div></div></div>
 </div>
 <a class="btn btn-primary" href="/products">Browse enterprise compute</a>
 {% if active_rentals|length == 0 %}<div class="alert alert-secondary mt-4">No active compute contracts found. Visit the Marketplace to rent compute power.</div>{% endif %}
@@ -25,7 +25,18 @@
 {% block scripts %}
 <script>
     var chartLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    new Chart(document.getElementById('earningsChart'), { type: 'line', data: { labels: chartLabels, datasets: [{ label: 'Earnings ($)', data: [38, 42, 35, 51, 48, 62, 58], borderColor: '#6f42c1', backgroundColor: 'rgba(111, 66, 193, 0.16)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
-    new Chart(document.getElementById('usageChart'), { type: 'line', data: { labels: chartLabels, datasets: [{ label: 'Compute hours', data: [18, 22, 20, 29, 31, 36, 34], borderColor: '#4338ca', backgroundColor: 'rgba(67, 56, 202, 0.14)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
+    var chartOptions = { responsive: true, maintainAspectRatio: false, animation: { duration: 0 }, plugins: { legend: { display: false } } };
+    var earningsChart = new Chart(document.getElementById('earningsChart'), { type: 'line', data: { labels: chartLabels, datasets: [{ label: 'Earnings ($)', data: [38, 42, 35, 51, 48, 62, 58], borderColor: '#6f42c1', backgroundColor: 'rgba(111, 66, 193, 0.16)', fill: true, tension: 0.4 }] }, options: chartOptions });
+    var usageChart = new Chart(document.getElementById('usageChart'), { type: 'line', data: { labels: chartLabels.slice(), datasets: [{ label: 'Compute hours', data: [18, 22, 20, 29, 31, 36, 34], borderColor: '#4338ca', backgroundColor: 'rgba(67, 56, 202, 0.14)', fill: true, tension: 0.4 }] }, options: chartOptions });
+    if (window.dashboardChartInterval) clearInterval(window.dashboardChartInterval);
+    window.dashboardChartInterval = setInterval(function () {
+        var newTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        [earningsChart, usageChart].forEach(function (chart) {
+            chart.data.labels.push(newTime);
+            chart.data.datasets[0].data.push(Math.max(0, chart.data.datasets[0].data[chart.data.datasets[0].data.length - 1] + (Math.random() * 8 - 4)));
+            if (chart.data.labels.length > 20) { chart.data.labels.shift(); chart.data.datasets[0].data.shift(); }
+            chart.update();
+        });
+    }, 3000);
 </script>
 {% endblock %}
