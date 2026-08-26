@@ -36,17 +36,6 @@
             <label for="benchmark_score" class="form-label">Benchmark Score</label>
             <input type="number" class="form-control" id="benchmark_score" name="benchmark_score" min="1" value="100" required>
         </div>
-        <div class="col-md-4 form-check ms-2">
-            <input type="checkbox" class="form-check-input" id="allow_failover" name="allow_failover" checked>
-            <label class="form-check-label" for="allow_failover">Allow SLA failover</label>
-        </div>
-        <div class="col-12 form-check ms-2">
-            <input type="checkbox" class="form-check-input" id="absorb_failovers" name="absorb_failovers">
-            <label class="form-check-label" for="absorb_failovers">Act as Failover Backup Node</label>
-            <span class="info-badge" tabindex="0" role="img" aria-label="SLA failover node information"
-                  data-bs-toggle="tooltip" data-bs-placement="top"
-                  title="SLA Failover Node: By enabling this, your computer stands by to automatically absorb interrupted tasks if another seller drops offline mid-job. You earn immediate takeover revenue, while the failing seller pays an SLA reliability penalty.">i</span>
-        </div>
         <div class="col-12">
             <button type="submit" class="btn btn-primary">Publish Listing</button>
         </div>
@@ -77,7 +66,5 @@
     }); });
     hourlyPrice.addEventListener('input', function () { hourlyPrice.dataset.edited = 'true'; });
     toggleCustom(cpuSelect, customCpu); toggleCustom(gpuSelect, customGpu); updateRecommendation();
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (el) { return new bootstrap.Tooltip(el); });
 </script>
 {% endblock %}

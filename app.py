@@ -116,6 +116,8 @@ def init_full_db():
         ("agreements", "offloaded_to_sellerid", "INTEGER NULL"),
         ("agreements", "penalty_fee", "REAL DEFAULT 0.0"),
         ("agreements", "allow_failover", "INTEGER DEFAULT 1"),
+        ("agreements", "is_priority", "INTEGER DEFAULT 0"),
+        ("agreements", "queue_status", "TEXT DEFAULT 'active'"),
     ]
     for table, column, definition in migrations:
         existing_columns = DATABASE.ViewQuery("PRAGMA table_info(" + table + ")")
@@ -163,9 +165,9 @@ def create_listing():
             (session['userid'], hardware_title, 'CPU + GPU',
              int(request.form['ram_gb']), float(request.form['hourly_price']),
              int(request.form.get('enterprise_only') == 'on'), int(request.form.get('benchmark_score', 100)),
-             int(request.form.get('allow_failover') == 'on'), int(request.form.get('absorb_failovers') == 'on'))
+              1, 1)
         )
-        return redirect('./products')
+        return redirect('/home')
 
     return render_template('create_listing.html', hardware_rates=HARDWARE_RATES)
 
@@ -302,7 +304,14 @@ def products_for_rent():
     cpu_type = request.args.get('cpu', '').strip()
     gpu_type = request.args.get('gpu', '').strip()
     max_price = request.args.get('max_price', '').strip()
-    query = "SELECT listings.*, users.firstname, users.rating AS seller_rating FROM listings JOIN users ON listings.sellerid = users.userid WHERE (listings.enterprise_only = 0 OR listings.enterprise_only = ?)"
+    query = """
+        SELECT listings.*, users.firstname, users.rating AS seller_rating,
+               COUNT(CASE WHEN agreements.queue_status IN ('active', 'queued') THEN 1 END) AS agreement_count
+        FROM listings
+        JOIN users ON listings.sellerid = users.userid
+        LEFT JOIN agreements ON listings.listingid = agreements.listingid
+        WHERE (listings.enterprise_only = 0 OR listings.enterprise_only = ?)
+    """
     params = [enterprise_access]
     if cpu_type:
         query += " AND listings.title LIKE ?"
@@ -317,7 +326,7 @@ def products_for_rent():
             params.append(max_price)
         except ValueError:
             max_price = ''
-    query += " ORDER BY " + ("seller_rating DESC" if sort_by == 'highest_rated' else "listings.hourly_price ASC")
+    query += " GROUP BY listings.listingid ORDER BY " + ("seller_rating DESC" if sort_by == 'highest_rated' else "listings.hourly_price ASC")
     listings = DATABASE.ViewQuery(query, tuple(params))
     active_agreements = DATABASE.ViewQuery("SELECT agreements.* FROM agreements WHERE agreements.buyerid = ? AND agreements.status = 'active' ORDER BY agreements.agreementid DESC LIMIT 1", (session['userid'],))
     app.logger.info("Products for rent")
@@ -343,7 +352,7 @@ def checkout(listing_id):
     if 'userid' not in session:
         return redirect('./')
 
-    listings = DATABASE.ViewQuery("SELECT listings.*, users.firstname FROM listings JOIN users ON listings.sellerid = users.userid WHERE listings.listingid = ? AND listings.status = 'available'", (listing_id,))
+    listings = DATABASE.ViewQuery("SELECT listings.*, users.firstname FROM listings JOIN users ON listings.sellerid = users.userid WHERE listings.listingid = ?", (listing_id,))
     if not listings:
         return "Listing is not available.", 404
 
@@ -354,29 +363,41 @@ def checkout(listing_id):
         return "This listing is available to approved enterprise accounts only.", 403
     fee_rate = 0.22 if is_enterprise else 0.15
     hours = int(request.form.get('hours', 1)) if request.method == 'POST' else 1
+    is_priority = int(request.form.get('is_priority') == 'on') if request.method == 'POST' else 0
     allow_failover = request.form.get('allow_failover') == 'on' if request.method == 'POST' else bool(listing.get('allow_failover', 1))
     if hours < 1:
         return render_template('checkout.html', listing=listing, hours=hours,
                                error='Hours must be at least 1.', fee_rate=fee_rate,
                                allow_failover=allow_failover, is_enterprise=is_enterprise), 400
 
-    seller_payout = listing['hourly_price'] * hours
-    buyer_fee = seller_payout * fee_rate
+    base_cost = listing['hourly_price'] * hours
+    priority_premium = base_cost * 3 if is_priority else 0
+    seller_payout = base_cost + (priority_premium * 0.05)
+    buyer_fee = (base_cost * fee_rate) + (priority_premium * 0.95)
     total_cost = seller_payout + buyer_fee
 
     if request.method == 'POST':
+        active_agreements = DATABASE.ViewQuery(
+            "SELECT agreementid FROM agreements WHERE listingid = ? AND status = 'active' AND queue_status = 'active'",
+            (listing_id,))
+        queue_status = 'active' if is_priority or not active_agreements else 'queued'
         DATABASE.ModifyQuery(
-            "INSERT INTO agreements (listingid, buyerid, hours, seller_payout, buyer_fee, total_cost, fee_rate, contract_type, escrow_status, allow_failover) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO agreements (listingid, buyerid, hours, seller_payout, buyer_fee, total_cost, fee_rate, contract_type, escrow_status, allow_failover, is_priority, queue_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (listing_id, session['userid'], hours, seller_payout, buyer_fee, total_cost, fee_rate,
-             'enterprise' if is_enterprise else 'standard', 'held', int(allow_failover))
+             'priority' if is_priority else ('enterprise' if is_enterprise else 'standard'), 'held', 1, is_priority, queue_status)
         )
-        DATABASE.ModifyQuery("UPDATE listings SET status = 'rented' WHERE listingid = ?", (listing_id,))
+        if is_priority:
+            DATABASE.ModifyQuery(
+                "UPDATE agreements SET queue_status = 'queued' WHERE listingid = ? AND status = 'active' AND is_priority = 0 AND agreementid != (SELECT MAX(agreementid) FROM agreements)",
+                (listing_id,))
         return redirect('./products')
 
     return render_template('checkout.html', listing=listing, hours=hours,
                            seller_payout=seller_payout, buyer_fee=buyer_fee,
                            total_cost=total_cost, fee_rate=fee_rate,
-                           allow_failover=allow_failover, is_enterprise=is_enterprise)
+                           allow_failover=allow_failover, is_enterprise=is_enterprise,
+                           is_priority=is_priority, base_cost=base_cost,
+                           priority_premium=priority_premium)
 
 @app.route('/api/run-task', methods=['POST'])
 def run_task():

@@ -37,13 +37,13 @@
                         <h5 class="card-title">{{ listing['title'] }}</h5>
                         <label class="compare-control"><input class="compare-checkbox" type="checkbox"> Compare</label>
                         <a class="seller-link" href="/seller/{{ listing['sellerid'] }}">{{ listing['firstname'] }} · {{ '%.1f'|format(listing['seller_rating'] or 5) }} &#9733;</a>
-                        {% if listing['status'] == 'available' %}<span class="live-status available">&#128994; Available Now</span>{% elif listing['status'] in ['rented', 'offloaded'] %}<span class="live-status busy">&#128993; Busy</span>{% else %}<span class="live-status offline">&#128308; Offline</span>{% endif %}
+                        {% if listing['agreement_count'] == 0 %}<span class="live-status available">&#128994; Available Now</span>{% else %}<span class="live-status busy">&#128993; Busy ({{ listing['agreement_count'] }} in Queue)</span>{% endif %}
                         {% if listing['absorb_failovers'] == 1 %}<span class="status-badge status-available mb-2">SLA Failover Node</span>{% endif %}
                         <p class="card-text mb-1"><strong>Type:</strong> {{ listing['hardware_type'] }}</p>
                         <p class="card-text mb-1"><strong>RAM:</strong> {{ listing['ram_gb'] }} GB</p>
                         <p class="card-text mb-3"><strong>Seller:</strong> {{ listing['firstname'] }}</p>
                         <p class="fs-5 mt-auto">${{ '%.2f'|format(listing['hourly_price']) }} / hour</p>
-                        {% if listing['status'] == 'available' %}<a href="/checkout/{{ listing['listingid'] }}" class="btn btn-success">Rent Hardware</a>{% else %}<button class="btn btn-outline-secondary" type="button" disabled>Currently unavailable</button>{% endif %}
+                        <a href="/checkout/{{ listing['listingid'] }}" class="btn btn-success">{% if listing['agreement_count'] == 0 %}Rent Hardware{% else %}Join Queue{% endif %}</a>
                     </div>
                 </div>
             </div>
