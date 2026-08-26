@@ -24,19 +24,22 @@
 {% endblock %}
 {% block scripts %}
 <script>
-    var chartLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     var chartOptions = { responsive: true, maintainAspectRatio: false, animation: { duration: 0 }, plugins: { legend: { display: false } } };
-    var earningsChart = new Chart(document.getElementById('earningsChart'), { type: 'line', data: { labels: chartLabels, datasets: [{ label: 'Earnings ($)', data: [38, 42, 35, 51, 48, 62, 58], borderColor: '#6f42c1', backgroundColor: 'rgba(111, 66, 193, 0.16)', fill: true, tension: 0.4 }] }, options: chartOptions });
-    var usageChart = new Chart(document.getElementById('usageChart'), { type: 'line', data: { labels: chartLabels.slice(), datasets: [{ label: 'Compute hours', data: [18, 22, 20, 29, 31, 36, 34], borderColor: '#4338ca', backgroundColor: 'rgba(67, 56, 202, 0.14)', fill: true, tension: 0.4 }] }, options: chartOptions });
-    if (window.dashboardChartInterval) clearInterval(window.dashboardChartInterval);
-    window.dashboardChartInterval = setInterval(function () {
-        var newTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        [earningsChart, usageChart].forEach(function (chart) {
-            chart.data.labels.push(newTime);
-            chart.data.datasets[0].data.push(Math.max(0, chart.data.datasets[0].data[chart.data.datasets[0].data.length - 1] + (Math.random() * 8 - 4)));
-            if (chart.data.labels.length > 20) { chart.data.labels.shift(); chart.data.datasets[0].data.shift(); }
-            chart.update();
+    var earningsChart = new Chart(document.getElementById('earningsChart'), { type: 'line', data: { labels: [], datasets: [{ label: 'Earnings ($)', data: [], borderColor: '#6f42c1', backgroundColor: 'rgba(111, 66, 193, 0.16)', fill: true, tension: 0.4 }] }, options: chartOptions });
+    var usageChart = new Chart(document.getElementById('usageChart'), { type: 'line', data: { labels: [], datasets: [{ label: 'Compute hours', data: [], borderColor: '#4338ca', backgroundColor: 'rgba(67, 56, 202, 0.14)', fill: true, tension: 0.4 }] }, options: chartOptions });
+    function refreshDashboardCharts() {
+        fetch('/api/chart-data').then(function (response) { return response.json(); }).then(function (response) {
+            if (response.status === 'error') return;
+            earningsChart.data.labels = response.labels;
+            earningsChart.data.datasets[0].data = response.earnings;
+            earningsChart.update();
+            usageChart.data.labels = response.labels;
+            usageChart.data.datasets[0].data = response.usage;
+            usageChart.update();
         });
-    }, 3000);
+    }
+    if (window.dashboardChartInterval) clearInterval(window.dashboardChartInterval);
+    refreshDashboardCharts();
+    window.dashboardChartInterval = setInterval(refreshDashboardCharts, 3000);
 </script>
 {% endblock %}

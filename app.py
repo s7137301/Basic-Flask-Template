@@ -118,6 +118,7 @@ def init_full_db():
         ("agreements", "allow_failover", "INTEGER DEFAULT 1"),
         ("agreements", "is_priority", "INTEGER DEFAULT 0"),
         ("agreements", "queue_status", "TEXT DEFAULT 'active'"),
+        ("agreements", "created_at", "TEXT DEFAULT ''"),
     ]
     for table, column, definition in migrations:
         existing_columns = DATABASE.ViewQuery("PRAGMA table_info(" + table + ")")
@@ -384,8 +385,9 @@ def checkout(listing_id):
         DATABASE.ModifyQuery(
             "INSERT INTO agreements (listingid, buyerid, hours, seller_payout, buyer_fee, total_cost, fee_rate, contract_type, escrow_status, allow_failover, is_priority, queue_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (listing_id, session['userid'], hours, seller_payout, buyer_fee, total_cost, fee_rate,
-             'priority' if is_priority else ('enterprise' if is_enterprise else 'standard'), 'held', 1, is_priority, queue_status)
+               'priority' if is_priority else ('enterprise' if is_enterprise else 'standard'), 'held', 1, is_priority, queue_status)
         )
+        DATABASE.ModifyQuery("UPDATE agreements SET created_at = datetime('now') WHERE agreementid = (SELECT MAX(agreementid) FROM agreements)")
         if is_priority:
             DATABASE.ModifyQuery(
                 "UPDATE agreements SET queue_status = 'queued' WHERE listingid = ? AND status = 'active' AND is_priority = 0 AND agreementid != (SELECT MAX(agreementid) FROM agreements)",
@@ -402,6 +404,65 @@ def checkout(listing_id):
 @app.route('/api/run-task', methods=['POST'])
 def run_task():
     return jsonify({'status': 'success', 'output': 'Task executed inside simulated sandbox container.'})
+
+@app.route('/api/chart-data')
+def chart_data():
+    if 'userid' not in session:
+        return jsonify({'status': 'error', 'message': 'Login required.'}), 401
+
+    labels = []
+    for days_ago in range(6, -1, -1):
+        date_row = DATABASE.ViewQuery("SELECT date('now', ? || ' days') AS day", (str(-days_ago),))
+        labels.append(date_row[0]['day'] if date_row else '')
+
+    earnings_rows = DATABASE.ViewQuery("""
+        SELECT date(CASE WHEN agreements.created_at = '' THEN 'now' ELSE agreements.created_at END) AS day,
+               COALESCE(SUM(agreements.seller_payout), 0) AS value
+        FROM agreements JOIN listings ON agreements.listingid = listings.listingid
+        WHERE listings.sellerid = ? AND day >= date('now', '-6 days')
+        GROUP BY day
+    """, (session['userid'],)) or []
+    usage_rows = DATABASE.ViewQuery("""
+        SELECT date(CASE WHEN created_at = '' THEN 'now' ELSE created_at END) AS day,
+               COALESCE(SUM(CASE WHEN completed_hours > 0 THEN completed_hours ELSE hours END), 0) AS value
+        FROM agreements
+        WHERE buyerid = ? AND day >= date('now', '-6 days')
+        GROUP BY day
+    """, (session['userid'],)) or []
+    earnings_by_day = {row['day']: float(row['value'] or 0) for row in earnings_rows}
+    usage_by_day = {row['day']: float(row['value'] or 0) for row in usage_rows}
+    earnings_data = [earnings_by_day.get(day, 0) for day in labels]
+    usage_data = [usage_by_day.get(day, 0) for day in labels]
+    response = {'labels': labels, 'data': earnings_data, 'earnings': earnings_data, 'usage': usage_data}
+    active_job_query = """
+        SELECT date(CASE WHEN created_at = '' THEN 'now' ELSE created_at END) AS day,
+               COUNT(*) AS value
+        FROM agreements
+        WHERE status = 'active' AND day >= date('now', '-6 days')
+    """
+    active_job_params = []
+    if session.get('permission') != 'admin':
+        active_job_query += " AND buyerid = ?"
+        active_job_params.append(session['userid'])
+    active_job_query += """
+        GROUP BY day
+    """
+    active_job_rows = DATABASE.ViewQuery(active_job_query, tuple(active_job_params)) or []
+    active_jobs_by_day = {row['day']: int(row['value'] or 0) for row in active_job_rows}
+    response['active_jobs'] = [active_jobs_by_day.get(day, 0) for day in labels]
+
+    if session.get('permission') == 'admin':
+        revenue_rows = DATABASE.ViewQuery("""
+            SELECT date(CASE WHEN created_at = '' THEN 'now' ELSE created_at END) AS day,
+                   COALESCE(SUM(buyer_fee), 0) AS value
+            FROM agreements
+            WHERE day >= date('now', '-6 days')
+            GROUP BY day
+        """) or []
+        revenue_by_day = {row['day']: float(row['value'] or 0) for row in revenue_rows}
+        response['data'] = [revenue_by_day.get(day, 0) for day in labels]
+        response['revenue'] = response['data']
+    return jsonify(response)
 
 @app.route('/api/simulate-failover', methods=['POST'])
 def simulate_failover():

@@ -50,18 +50,22 @@
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    var adminLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     var adminOptions = { responsive: true, maintainAspectRatio: false, animation: { duration: 0 }, plugins: { legend: { display: false } } };
-    var revenueChart = new Chart(document.getElementById('revenueChart'), { type: 'line', data: { labels: adminLabels, datasets: [{ label: 'Revenue ($)', data: [84, 102, 96, 126, 143, 137, 168], borderColor: '#6f42c1', backgroundColor: 'rgba(111, 66, 193, 0.16)', fill: true, tension: 0.35 }] }, options: adminOptions });
-    var jobsChart = new Chart(document.getElementById('jobsChart'), { type: 'bar', data: { labels: adminLabels.slice(), datasets: [{ label: 'Active jobs', data: [8, 11, 9, 14, 16, 19, 17], backgroundColor: '#4338ca', borderRadius: 5 }] }, options: adminOptions });
+    var revenueChart = new Chart(document.getElementById('revenueChart'), { type: 'line', data: { labels: [], datasets: [{ label: 'Revenue ($)', data: [], borderColor: '#6f42c1', backgroundColor: 'rgba(111, 66, 193, 0.16)', fill: true, tension: 0.35 }] }, options: adminOptions });
+    var jobsChart = new Chart(document.getElementById('jobsChart'), { type: 'bar', data: { labels: [], datasets: [{ label: 'Active jobs', data: [], backgroundColor: '#4338ca', borderRadius: 5 }] }, options: adminOptions });
+    function refreshAdminCharts() {
+        fetch('/api/chart-data').then(function (response) { return response.json(); }).then(function (response) {
+            if (response.status === 'error') return;
+            revenueChart.data.labels = response.labels;
+            revenueChart.data.datasets[0].data = response.revenue || response.data;
+            revenueChart.update();
+            jobsChart.data.labels = response.labels;
+            jobsChart.data.datasets[0].data = response.active_jobs || response.usage;
+            jobsChart.update();
+        });
+    }
     if (window.adminChartInterval) clearInterval(window.adminChartInterval);
-    window.adminChartInterval = setInterval(function () {
-        var newTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        revenueChart.data.labels.push(newTime);
-        revenueChart.data.datasets[0].data.push(Math.max(0, revenueChart.data.datasets[0].data[revenueChart.data.datasets[0].data.length - 1] + (Math.random() * 20 - 10)));
-        jobsChart.data.labels.push(newTime);
-        jobsChart.data.datasets[0].data.push(Math.max(0, Math.round(jobsChart.data.datasets[0].data[jobsChart.data.datasets[0].data.length - 1] + (Math.random() * 6 - 3))));
-        [revenueChart, jobsChart].forEach(function (chart) { if (chart.data.labels.length > 20) { chart.data.labels.shift(); chart.data.datasets[0].data.shift(); } chart.update(); });
-    }, 3000);
+    refreshAdminCharts();
+    window.adminChartInterval = setInterval(refreshAdminCharts, 3000);
 </script>
 {% endblock %}
