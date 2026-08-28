@@ -794,3 +794,241 @@ INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:21:12] "[36mGET /static/css/custom.
 INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:21:13] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
 INFO:werkzeug: * Detected change in "c:\\Users\\S7137301\\OneDrive - St Joseph's College, Gregory Terrace\\2026\\Digital Solutions\\Term 3\\Basic-Flask-Template\\app.py", reloading
 INFO:werkzeug: * Restarting with stat
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.0.224.62:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 593-560-539
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:06] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:06] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:06] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:08] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:08] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:09] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:17] "[32mPOST / HTTP/1.1[0m" 302 -
+INFO:app:Home
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:17] "GET /home HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:17] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:17] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:17] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:20] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:app:Home
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:21] "GET /home HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:21] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:21] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:21] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:24] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:27] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:30] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:34] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:app:Products for rent
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:35] "GET /products HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:36] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:36] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:41] "GET /status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:41] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:41] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Products for rent
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:43] "GET /products HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:43] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:43] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:46] "GET /create-listing HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:46] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:46] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:50] "GET /security HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:50] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:28:50] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:29:19] "[33mGET /enterprise_dahboard HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:29:24] "[33mGET /enterprise_dashboard HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:29:44] "[33mGET /enterprise_dashboard HTTP/1.1[0m" 404 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:29:58] "[32mGET / HTTP/1.1[0m" 302 -
+INFO:app:Home
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:29:59] "GET /home HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:29:59] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:29:59] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:29:59] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:02] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:05] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:08] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:app:Log out
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:10] "[32mGET /logout HTTP/1.1[0m" 302 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:10] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:10] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:10] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:12] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:12] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:13] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:21] "[32mPOST / HTTP/1.1[0m" 302 -
+INFO:app:Home
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:21] "GET /home HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:22] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:22] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:22] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:25] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:28] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:31] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:34] "GET /agreement/2 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:34] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:34] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Home
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:38] "GET /home HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:38] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:38] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:38] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:app:Products for rent
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:39] "GET /products HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:40] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:40] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Home
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:57] "GET /home HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:57] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:57] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:30:57] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:31:00] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:31:03] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:31:06] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:31:09] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:app:Products for rent
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:31:10] "GET /products HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:31:10] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:31:10] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Products for rent
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:31:46] "GET /products?sort=highest_rated&cpu=&gpu=&max_price= HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:31:46] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:31:46] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Products for rent
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:32:12] "GET /products?sort=cheapest&cpu=Intel+Xeon+Platinum&gpu=&max_price= HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:32:13] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:32:13] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Products for rent
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:32:20] "GET /products?sort=cheapest&cpu=&gpu=&max_price=2 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:32:20] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:32:21] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Products for rent
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:32:25] "GET /products?sort=cheapest&cpu=&gpu=&max_price= HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:32:25] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:32:25] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:32:31] "GET /checkout/1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:32:31] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:32:31] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:32:42] "GET /checkout/2 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:32:42] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:32:43] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:33:01] "[32mGET / HTTP/1.1[0m" 302 -
+INFO:app:Home
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:33:01] "GET /home HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:33:01] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:33:01] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:33:01] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:33:05] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:33:07] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:33:08] "POST /api/notifications HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:33:08] "POST /api/notifications HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:33:08] "POST /api/notifications HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:33:08] "POST /api/notifications HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:33:09] "POST /api/notifications HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:33:11] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:33:13] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:33:17] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:33:19] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:33:23] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:app:Log out
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:33:24] "[32mGET /logout HTTP/1.1[0m" 302 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:33:25] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:33:25] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:33:25] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:38:06] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:38:07] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:38:07] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:38:09] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:38:09] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:38:09] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:38:22] "[32mPOST / HTTP/1.1[0m" 302 -
+INFO:app:Home
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:38:22] "GET /home HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:38:22] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:38:22] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:38:23] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:app:Products for rent
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:38:24] "GET /products HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:38:25] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:38:25] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:38:29] "GET /checkout/2 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:38:29] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Aug/2026 14:38:29] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.0.224.98:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 593-560-539
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:44:57] "[32mGET / HTTP/1.1[0m" 302 -
+INFO:app:Home
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:44:57] "GET /home HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:44:57] "GET /static/css/custom.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:44:58] "GET /static/js/new_ajax_helper.js HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:44:58] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:44:58] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:01] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:04] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:07] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:app:Log out
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:10] "[32mGET /logout HTTP/1.1[0m" 302 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:10] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:10] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:10] "[31m[1mGET /api/chart-data HTTP/1.1[0m" 401 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:10] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:12] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:13] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:13] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:24] "[32mPOST / HTTP/1.1[0m" 302 -
+INFO:app:Admin
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:24] "GET /admin HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:24] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:25] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:25] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:28] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:31] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:34] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:37] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:40] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:app:Log out
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:42] "[32mGET /logout HTTP/1.1[0m" 302 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:42] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:42] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 12:45:43] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug: * Detected change in "c:\\Users\\S7137301\\OneDrive - St Joseph's College, Gregory Terrace\\2026\\Digital Solutions\\Term 3\\Basic-Flask-Template\\app.py", reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 593-560-539
+INFO:app:Home
+INFO:werkzeug: * Detected change in "c:\\Users\\S7137301\\OneDrive - St Joseph's College, Gregory Terrace\\2026\\Digital Solutions\\Term 3\\Basic-Flask-Template\\app.py", reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 593-560-539
+INFO:werkzeug: * Detected change in "c:\\Users\\S7137301\\OneDrive - St Joseph's College, Gregory Terrace\\2026\\Digital Solutions\\Term 3\\Basic-Flask-Template\\app.py", reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 593-560-539
+INFO:app:Home
+INFO:werkzeug: * Detected change in "c:\\Users\\S7137301\\OneDrive - St Joseph's College, Gregory Terrace\\2026\\Digital Solutions\\Term 3\\Basic-Flask-Template\\app.py", reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 593-560-539

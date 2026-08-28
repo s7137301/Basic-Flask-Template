@@ -17,8 +17,8 @@
 {% if active_rentals|length == 0 %}<div class="alert alert-secondary mt-4">No active compute contracts found. Visit the Marketplace to rent compute power.</div>{% endif %}
 {% if active_rentals %}
 <h3 class="mt-5">Active agreements</h3>
-<div class="responsive-table"><table class="table"><thead><tr><th>Agreement</th><th>Hardware</th><th>Hours</th><th>Escrow</th></tr></thead><tbody>
-{% for rental in active_rentals %}<tr><td><a href="/agreement/{{ rental['agreementid'] }}">#{{ rental['agreementid'] }}</a></td><td>{{ rental['title'] }}</td><td>{{ rental['hours'] }}</td><td>{{ rental['escrow_status'] }}</td></tr>{% endfor %}
+<div class="responsive-table"><table class="table"><thead><tr><th>Agreement</th><th>Hardware</th><th>Hours</th><th>Time Remaining</th><th>Escrow</th></tr></thead><tbody>
+{% for rental in active_rentals %}<tr data-start-time="{{ rental['start_time'] or '' }}" data-end-time="{{ rental['end_time'] or '' }}"><td><a href="/agreement/{{ rental['agreementid'] }}">#{{ rental['agreementid'] }}</a></td><td>{{ rental['title'] }}</td><td>{{ rental['hours'] }}</td><td><span class="countdown-timer" data-end-time="{{ rental['end_time'] or '' }}">Calculating...</span><div class="progress mt-2" style="height: 10px;"><div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 0%;"></div></div></td><td>{{ rental['escrow_status'] }}</td></tr>{% endfor %}
 </tbody></table></div>
 {% endif %}
 {% endblock %}
@@ -41,5 +41,33 @@
     if (window.dashboardChartInterval) clearInterval(window.dashboardChartInterval);
     refreshDashboardCharts();
     window.dashboardChartInterval = setInterval(refreshDashboardCharts, 3000);
+    var countdownReloaded = false;
+    function updateCountdowns() {
+        document.querySelectorAll('.countdown-timer').forEach(function (timer) {
+            var rental = timer.closest('[data-start-time]');
+            var startTime = new Date(rental.dataset.startTime.replace(' ', 'T'));
+            var endTime = new Date(rental.dataset.endTime.replace(' ', 'T'));
+            var progressBar = rental.querySelector('.progress-bar');
+            if (!rental.dataset.startTime || !rental.dataset.endTime || isNaN(startTime.getTime()) || isNaN(endTime.getTime())) { timer.textContent = 'Awaiting start time'; return; }
+            let totalTime = endTime - startTime;
+            let elapsedTime = new Date() - startTime;
+            let percentage = (elapsedTime / totalTime) * 100;
+            percentage = Math.min(100, Math.max(0, percentage));
+            progressBar.style.width = percentage + '%';
+            var difference = endTime.getTime() - new Date().getTime();
+            if (difference <= 0) {
+                timer.textContent = 'Completed - Refreshing...';
+                if (!countdownReloaded) { countdownReloaded = true; window.location.reload(); }
+                return;
+            }
+            var totalSeconds = Math.floor(difference / 1000);
+            var hours = Math.floor(totalSeconds / 3600);
+            var minutes = Math.floor((totalSeconds % 3600) / 60);
+            var seconds = totalSeconds % 60;
+            timer.textContent = String(hours).padStart(2, '0') + 'h ' + String(minutes).padStart(2, '0') + 'm ' + String(seconds).padStart(2, '0') + 's';
+        });
+    }
+    updateCountdowns();
+    setInterval(updateCountdowns, 1000);
 </script>
 {% endblock %}

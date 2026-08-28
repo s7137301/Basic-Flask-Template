@@ -1,6 +1,7 @@
 from flask import *
 import sys, os
 import logging
+from datetime import datetime, timedelta
 from interfaces.databaseinterface import Database
 from interfaces.hashing import *
 from werkzeug.utils import secure_filename    
@@ -119,6 +120,8 @@ def init_full_db():
         ("agreements", "is_priority", "INTEGER DEFAULT 0"),
         ("agreements", "queue_status", "TEXT DEFAULT 'active'"),
         ("agreements", "created_at", "TEXT DEFAULT ''"),
+        ("agreements", "start_time", "DATETIME"),
+        ("agreements", "end_time", "DATETIME"),
     ]
     for table, column, definition in migrations:
         existing_columns = DATABASE.ViewQuery("PRAGMA table_info(" + table + ")")
@@ -180,6 +183,8 @@ def logout():
 
 @app.route('/admin', methods=["GET","POST"])
 def admin():
+
+    check_expired_rentals()
 
     if 'permission' not in session:
         return redirect("./")
@@ -243,6 +248,8 @@ def security():
 @app.route('/home')
 def home():
 
+    check_expired_rentals()
+
     if 'userid' not in session:
         return redirect('./')
 
@@ -253,7 +260,7 @@ def home():
 
     user = user[0]
     active_rentals = DATABASE.ViewQuery(
-        "SELECT agreements.*, listings.title FROM agreements JOIN listings ON agreements.listingid = listings.listingid WHERE agreements.buyerid = ? AND agreements.status = 'active'",
+        "SELECT agreements.agreementid, agreements.hours, agreements.escrow_status, agreements.start_time, agreements.end_time, listings.title FROM agreements JOIN listings ON agreements.listingid = listings.listingid WHERE agreements.buyerid = ? AND agreements.status = 'active'",
         (session['userid'],)) or []
     listings_count = DATABASE.ViewQuery(
         "SELECT COUNT(*) AS total FROM listings WHERE sellerid = ?", (session['userid'],))
@@ -378,14 +385,17 @@ def checkout(listing_id):
     total_cost = seller_payout + buyer_fee
 
     if request.method == 'POST':
+        start_time = datetime.now()
+        end_time = start_time + timedelta(hours=hours)
         active_agreements = DATABASE.ViewQuery(
             "SELECT agreementid FROM agreements WHERE listingid = ? AND status = 'active' AND queue_status = 'active'",
             (listing_id,))
         queue_status = 'active' if is_priority or not active_agreements else 'queued'
         DATABASE.ModifyQuery(
-            "INSERT INTO agreements (listingid, buyerid, hours, seller_payout, buyer_fee, total_cost, fee_rate, contract_type, escrow_status, allow_failover, is_priority, queue_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO agreements (listingid, buyerid, hours, seller_payout, buyer_fee, total_cost, fee_rate, contract_type, escrow_status, allow_failover, is_priority, queue_status, start_time, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (listing_id, session['userid'], hours, seller_payout, buyer_fee, total_cost, fee_rate,
-               'priority' if is_priority else ('enterprise' if is_enterprise else 'standard'), 'held', 1, is_priority, queue_status)
+                    'priority' if is_priority else ('enterprise' if is_enterprise else 'standard'), 'held', 1, is_priority, queue_status,
+                 start_time.strftime('%Y-%m-%d %H:%M:%S'), end_time.strftime('%Y-%m-%d %H:%M:%S'))
         )
         DATABASE.ModifyQuery("UPDATE agreements SET created_at = datetime('now') WHERE agreementid = (SELECT MAX(agreementid) FROM agreements)")
         if is_priority:
@@ -400,6 +410,13 @@ def checkout(listing_id):
                            allow_failover=allow_failover, is_enterprise=is_enterprise,
                            is_priority=is_priority, base_cost=base_cost,
                            priority_premium=priority_premium)
+
+def check_expired_rentals():
+    expired_agreements = DATABASE.ViewQuery(
+        "SELECT agreementid FROM agreements WHERE status = 'active' AND end_time IS NOT NULL AND end_time <= ?",
+        (datetime.now().strftime('%Y-%m-%d %H:%M:%S'),)) or []
+    for agreement in expired_agreements:
+        DATABASE.ModifyQuery("UPDATE agreements SET status = 'completed' WHERE agreementid = ?", (agreement['agreementid'],))
 
 @app.route('/api/run-task', methods=['POST'])
 def run_task():
