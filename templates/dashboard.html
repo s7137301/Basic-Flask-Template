@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4"><div><p class="text-uppercase text-muted mb-1">Operations center</p><h2>Detailed Dashboard</h2></div><span class="security-status">Live telemetry</span></div>
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card metric-card p-3"><small>Bandwidth</small><strong class="fs-3">{{ technical_metrics['bandwidth'] }}</strong></div></div>
+    <div class="col-md-3"><div class="card metric-card p-3"><small>Platform uptime</small><strong class="fs-3">{{ technical_metrics['uptime'] }}</strong></div></div>
+    <div class="col-md-3"><div class="card metric-card p-3"><small>Active nodes</small><strong class="fs-3">{{ technical_metrics['active_nodes'] }}</strong></div></div>
+    <div class="col-md-3"><div class="card metric-card p-3"><small>Network latency</small><strong class="fs-3">{{ technical_metrics['latency'] }}</strong></div></div>
+</div>
+<div class="row g-4 mb-4"><div class="col-lg-6"><div class="card p-3 chart-card"><h3>Seller earnings</h3><div class="chart-container" style="position: relative; height: 300px; width: 100%;"><canvas id="earningsChart"></canvas></div></div></div><div class="col-lg-6"><div class="card p-3 chart-card"><h3>Buyer compute usage</h3><div class="chart-container" style="position: relative; height: 300px; width: 100%;"><canvas id="usageChart"></canvas></div></div></div></div>
+<h3>Active compute contracts</h3>
+{% if active_rentals %}<div class="responsive-table"><table class="table"><thead><tr><th>Agreement</th><th>Hardware</th><th>Time remaining</th><th>Progress</th></tr></thead><tbody>{% for agreement in active_rentals %}<tr data-start-time="{{ agreement['start_time'] or '' }}" data-end-time="{{ agreement['end_time'] or '' }}"><td>#{{ agreement['agreementid'] }}</td><td>{{ agreement['title'] }}</td><td><span class="countdown-timer">Calculating...</span></td><td><div class="progress" style="height: 10px;"><div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" style="width: 0%;"></div></div></td></tr>{% endfor %}</tbody></table></div>{% else %}<p class="alert alert-info">No active compute contracts.</p>{% endif %}
+{% endblock %}
+{% block scripts %}
+<script>
+var chartOptions = {responsive: true, maintainAspectRatio: false, animation: {duration: 0}, plugins: {legend: {display: false}}};
+var earningsChart = new Chart(document.getElementById('earningsChart'), {type: 'line', data: {labels: [], datasets: [{label: 'Earnings ($)', data: [], borderColor: '#6f42c1', backgroundColor: 'rgba(111, 66, 193, .16)', fill: true, tension: .4}]}, options: chartOptions});
+var usageChart = new Chart(document.getElementById('usageChart'), {type: 'line', data: {labels: [], datasets: [{label: 'Compute hours', data: [], borderColor: '#4338ca', backgroundColor: 'rgba(67, 56, 202, .14)', fill: true, tension: .4}]}, options: chartOptions});
+function refreshDashboardCharts() { fetch('/api/chart-data').then(function (r) { return r.json(); }).then(function (data) { if (data.status === 'error') return; earningsChart.data.labels = data.labels; earningsChart.data.datasets[0].data = data.earnings; earningsChart.update(); usageChart.data.labels = data.labels; usageChart.data.datasets[0].data = data.usage; usageChart.update(); }); }
+if (window.dashboardChartInterval) clearInterval(window.dashboardChartInterval); refreshDashboardCharts(); window.dashboardChartInterval = setInterval(refreshDashboardCharts, 3000);
+var countdownReloaded = false;
+function updateCountdowns() { document.querySelectorAll('[data-start-time]').forEach(function (rental) { var startTime = new Date(rental.dataset.startTime.replace(' ', 'T')); var endTime = new Date(rental.dataset.endTime.replace(' ', 'T')); var timer = rental.querySelector('.countdown-timer'); var progress = rental.querySelector('.progress-bar'); if (isNaN(startTime) || isNaN(endTime)) return; let totalTime = endTime - startTime; let elapsedTime = new Date() - startTime; let percentage = Math.min(100, Math.max(0, (elapsedTime / totalTime) * 100)); progress.style.width = percentage + '%'; var difference = endTime - new Date(); if (difference <= 0) { timer.textContent = 'Completed - Refreshing...'; if (!countdownReloaded) { countdownReloaded = true; window.location.reload(); } return; } let seconds = Math.floor(difference / 1000); timer.textContent = String(Math.floor(seconds / 3600)).padStart(2, '0') + 'h ' + String(Math.floor((seconds % 3600) / 60)).padStart(2, '0') + 'm ' + String(seconds % 60).padStart(2, '0') + 's'; }); }
+updateCountdowns(); setInterval(updateCountdowns, 1000);
+</script>
+{% endblock %}

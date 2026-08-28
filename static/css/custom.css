@@ -74,6 +74,14 @@
 .seller-avatar { border-radius: 50%; height: 76px; object-fit: cover; width: 76px; }
 .seller-avatar-placeholder { align-items: center; background: #6f42c1; color: #fff; display: inline-flex; font-size: 2rem; justify-content: center; }
 .seller-rating { color: #6f42c1; font-weight: 600; }
+.site-footer { background: #15132b; color: #d8d6ed; margin-top: 3rem; padding: 3rem 0; }
+.footer-grid { display: grid; gap: 2rem; grid-template-columns: 2fr repeat(3, 1fr); }
+.site-footer h3, .site-footer h4 { color: #fff; }
+.site-footer a { color: #bcb8d8; display: block; margin: 0.5rem 0; text-decoration: none; }
+.site-footer a:hover { color: #fff; }
+.sponsored-block { background: #fbfaff; border: 1px solid #ddd7f7; border-radius: 0.6rem; height: 100%; padding: 1.25rem; }
+.sponsored-label { color: #6f42c1; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+.sponsored-block a { color: #5b21b6; font-weight: 600; text-decoration: none; }
 .notification-button { text-decoration: none; }
 .notification-badge { background: #dc3545; border-radius: 999px; color: #fff; font-size: 0.65rem; min-width: 1.1rem; padding: 0.15rem 0.3rem; position: absolute; right: 0.15rem; top: 0.1rem; }
 .notification-menu { min-width: 18rem; }

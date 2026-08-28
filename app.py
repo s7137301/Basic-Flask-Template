@@ -110,6 +110,7 @@ def init_full_db():
         ("listings", "benchmark_score", "INTEGER DEFAULT 100"),
         ("listings", "allow_failover", "INTEGER DEFAULT 1"),
         ("listings", "absorb_failovers", "INTEGER DEFAULT 0"),
+        ("listings", "queue_status", "TEXT DEFAULT 'active'"),
         ("agreements", "fee_rate", "REAL DEFAULT 0.15"),
         ("agreements", "contract_type", "TEXT DEFAULT 'standard'"),
         ("agreements", "escrow_status", "TEXT DEFAULT 'held'"),
@@ -174,6 +175,25 @@ def create_listing():
         return redirect('/home')
 
     return render_template('create_listing.html', hardware_rates=HARDWARE_RATES)
+
+@app.route('/admin/migrate-hardware')
+def migrate_hardware():
+    if session.get('permission') != 'admin':
+        return redirect('./')
+    listing_columns = DATABASE.ViewQuery("PRAGMA table_info(listings)") or []
+    if 'queue_status' not in {row['name'] for row in listing_columns}:
+        DATABASE.ModifyQuery("ALTER TABLE listings ADD COLUMN queue_status TEXT DEFAULT 'active'")
+    listings = DATABASE.ViewQuery("SELECT listingid, title, hardware_type, queue_status, allow_failover FROM listings") or []
+    for listing in listings:
+        DATABASE.ModifyQuery(
+            "UPDATE listings SET queue_status = 'active', allow_failover = 1 WHERE listingid = ?",
+            (listing['listingid'],))
+        title = listing.get('title') or ''
+        if '+' not in title and listing.get('hardware_type'):
+            DATABASE.ModifyQuery(
+                "UPDATE listings SET title = ?, hardware_type = 'CPU + GPU' WHERE listingid = ?",
+                (title.strip(), listing['listingid']))
+    return jsonify({'status': 'success', 'migrated_listings': len(listings)})
 
 @app.route('/logout')
 def logout():
@@ -267,12 +287,18 @@ def home():
     earnings = DATABASE.ViewQuery(
         "SELECT COALESCE(SUM(agreements.seller_payout), 0) AS total FROM agreements JOIN listings ON agreements.listingid = listings.listingid WHERE listings.sellerid = ?",
         (session['userid'],))
+    spending = DATABASE.ViewQuery(
+        "SELECT COALESCE(SUM(total_cost), 0) AS total FROM agreements WHERE buyerid = ?",
+        (session['userid'],))
     escrow = DATABASE.ViewQuery(
         "SELECT COALESCE(SUM(total_cost), 0) AS total FROM agreements WHERE buyerid = ? AND escrow_status IN ('held', 'partial_released')",
         (session['userid'],))
     reliability = DATABASE.ViewQuery(
         "SELECT COALESCE(AVG(CASE WHEN hours = 0 THEN 100.0 ELSE completed_hours * 100.0 / hours END), 100.0) AS score FROM agreements WHERE buyerid = ?",
         (session['userid'],))
+    fleet_nodes = DATABASE.ViewQuery(
+        "SELECT listingid, title, hardware_type, status, benchmark_score FROM listings WHERE sellerid = ? ORDER BY listingid DESC",
+        (session['userid'],)) or []
     activity_history = DATABASE.ViewQuery("""
         SELECT date('now') AS activity_date, listings.title || ' rental' AS activity_type,
                agreements.total_cost AS amount, agreements.status AS raw_status
@@ -290,15 +316,34 @@ def home():
     dashboard = {
         'active_rentals': active_rentals,
         'total_earnings': earnings[0]['total'] if earnings else 0,
+        'total_spent': spending[0]['total'] if spending else 0,
         'escrow_balance': escrow[0]['total'] if escrow else 0,
         'reliability_score': reliability[0]['score'] if reliability else 100,
         'listings_count': listings_count[0]['total'] if listings_count else 0,
         'enterprise_pending': user.get('enterprise_status') == 'pending',
         'activity_history': activity_history,
+        'fleet_nodes': fleet_nodes,
     }
     app.logger.info("Home")
     template = "enterprise_dashboard.html" if user.get('is_enterprise') == 1 else "home.html"
     return render_template(template, user=user, **dashboard)
+
+@app.route('/dashboard')
+def dashboard():
+    check_expired_rentals()
+    if 'userid' not in session:
+        return redirect('./')
+    user = DATABASE.ViewQuery("SELECT * FROM users WHERE userid = ?", (session['userid'],))
+    if not user:
+        session.clear()
+        return redirect('./')
+    user = user[0]
+    active_rentals = DATABASE.ViewQuery(
+        "SELECT agreements.*, listings.title FROM agreements JOIN listings ON agreements.listingid = listings.listingid WHERE agreements.buyerid = ? AND (agreements.status = 'active' OR agreements.queue_status = 'active')",
+        (session['userid'],)) or []
+    technical_metrics = {'bandwidth': '2.4 Gbps', 'uptime': '99.98%', 'active_nodes': 18, 'latency': '24 ms'}
+    return render_template('dashboard.html', user=user, active_rentals=active_rentals,
+                           technical_metrics=technical_metrics)
 
 @app.route('/products')
 def products_for_rent():

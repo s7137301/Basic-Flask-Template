@@ -1292,3 +1292,40 @@ INFO:werkzeug: * Detected change in "c:\\Users\\S7137301\\OneDrive - St Joseph's
 INFO:werkzeug: * Restarting with stat
 WARNING:werkzeug: * Debugger is active!
 INFO:werkzeug: * Debugger PIN: 593-560-539
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:03:22] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:04:07] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:04:08] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:04:10] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:04:12] "[32mGET / HTTP/1.1[0m" 302 -
+INFO:app:Home
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:04:12] "GET /home HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:04:12] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:04:12] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:04:12] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:04:16] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:04:18] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:04:22] "GET /api/chart-data HTTP/1.1" 200 -
+INFO:app:Products for rent
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:04:22] "GET /products HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:04:22] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:04:23] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug: * Detected change in "c:\\Users\\S7137301\\OneDrive - St Joseph's College, Gregory Terrace\\2026\\Digital Solutions\\Term 3\\Basic-Flask-Template\\app.py", reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 593-560-539
+INFO:werkzeug: * Detected change in "c:\\Users\\S7137301\\OneDrive - St Joseph's College, Gregory Terrace\\2026\\Digital Solutions\\Term 3\\Basic-Flask-Template\\app.py", reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 593-560-539
+INFO:werkzeug: * Detected change in "c:\\Users\\S7137301\\OneDrive - St Joseph's College, Gregory Terrace\\2026\\Digital Solutions\\Term 3\\Basic-Flask-Template\\app.py", reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 593-560-539
+INFO:werkzeug: * Detected change in "c:\\Users\\S7137301\\OneDrive - St Joseph's College, Gregory Terrace\\2026\\Digital Solutions\\Term 3\\Basic-Flask-Template\\app.py", reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 593-560-539
+INFO:app:Login
+INFO:app:Home
+INFO:app:Admin

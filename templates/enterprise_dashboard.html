@@ -21,6 +21,12 @@
 {% for rental in active_rentals %}<tr data-start-time="{{ rental['start_time'] or '' }}" data-end-time="{{ rental['end_time'] or '' }}"><td><a href="/agreement/{{ rental['agreementid'] }}">#{{ rental['agreementid'] }}</a></td><td>{{ rental['title'] }}</td><td>{{ rental['hours'] }}</td><td><span class="countdown-timer" data-end-time="{{ rental['end_time'] or '' }}">Calculating...</span><div class="progress mt-2" style="height: 10px;"><div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 0%;"></div></div></td><td>{{ rental['escrow_status'] }}</td></tr>{% endfor %}
 </tbody></table></div>
 {% endif %}
+<section class="mt-5">
+    <div class="d-flex justify-content-between align-items-center"><div><p class="text-uppercase text-muted mb-1">Fleet operations</p><h3>Fleet Management</h3></div><span class="security-status">{{ fleet_nodes|length }} nodes</span></div>
+    <div class="responsive-table"><table class="table align-middle"><thead><tr><th>Node ID</th><th>Hardware</th><th>Current Load</th><th>Temp</th><th>Uptime</th><th>Health</th><th>Action</th></tr></thead><tbody>
+    {% for node in fleet_nodes %}<tr><td>NODE-{{ '%04d'|format(node['listingid']) }}</td><td>{{ node['title'] }}</td><td>{{ (node['benchmark_score'] % 64) + 20 }}%</td><td>{{ (node['benchmark_score'] % 18) + 42 }} °C</td><td>99.9%</td><td>{% if node['status'] == 'available' %}<span class="badge text-bg-success">Healthy</span>{% else %}<span class="badge text-bg-warning">Busy</span>{% endif %}</td><td><button class="btn btn-sm btn-outline-danger" type="button">Reboot Node</button></td></tr>{% else %}<tr><td colspan="7"><div class="alert alert-info mb-0">No compute nodes are registered in your enterprise fleet yet.</div></td></tr>{% endfor %}
+    </tbody></table></div>
+</section>
 {% endblock %}
 {% block scripts %}
 <script>
