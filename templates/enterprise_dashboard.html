@@ -4,16 +4,16 @@
 <p class="text-muted">Welcome {{ session['name'] }}. Your enterprise contracts use SLA-aware pricing and escrow.</p>
 {% if enterprise_pending %}<div class="alert alert-warning">Your Enterprise Account verification is currently pending Admin review.</div>{% endif %}
 <div class="row g-4 mb-4">
-    <div class="col-md-3"><div class="card p-3"><small>Active rentals</small><strong class="fs-3">{{ active_rentals|length }}</strong></div></div>
-    <div class="col-md-3"><div class="card p-3"><small>Total earnings</small><strong class="fs-3">${{ '%.2f'|format(total_earnings) }}</strong></div></div>
-    <div class="col-md-3"><div class="card p-3"><small>Escrow balance</small><strong class="fs-3">${{ '%.2f'|format(escrow_balance) }}</strong></div></div>
-    <div class="col-md-3"><div class="card p-3"><small>SLA reliability</small><strong class="fs-3">{{ '%.1f'|format(reliability_score) }}%</strong></div></div>
+    <div class="col-md-3"><div class="card p-3"><small>Total fleet size</small><strong class="fs-3">{{ total_fleet_size }}</strong><span class="text-muted">nodes</span></div></div>
+    <div class="col-md-3"><div class="card p-3"><small>Active utilization</small><strong class="fs-3">{{ '%.1f'|format(active_utilization) }}%</strong><span class="text-muted">of fleet</span></div></div>
+    <div class="col-md-3"><div class="card p-3"><small>Real-time revenue</small><strong class="fs-3">${{ '%.2f'|format(realtime_revenue) }}</strong><span class="text-muted">completed agreements</span></div></div>
+    <div class="col-md-3"><div class="card p-3"><small>Active rentals</small><strong class="fs-3">{{ active_rentals|length }}</strong><span class="text-muted">contracts</span></div></div>
 </div>
 <div class="row g-4 mb-4">
     <div class="col-lg-6"><div class="card p-3 chart-card"><h3>Seller earnings</h3><div class="chart-container" style="position: relative; height: 300px; width: 100%;"><canvas id="earningsChart"></canvas></div></div></div>
     <div class="col-lg-6"><div class="card p-3 chart-card"><h3>Buyer compute usage</h3><div class="chart-container" style="position: relative; height: 300px; width: 100%;"><canvas id="usageChart"></canvas></div></div></div>
 </div>
-<a class="btn btn-primary" href="/products">Browse enterprise compute</a>
+<div class="d-flex gap-2"><a class="btn btn-primary" href="/products">Browse enterprise compute</a><button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#bulkAddModal">Bulk Add Nodes</button></div>
 {% if active_rentals|length == 0 %}<div class="alert alert-secondary mt-4">No active compute contracts found. Visit the Marketplace to rent compute power.</div>{% endif %}
 {% if active_rentals %}
 <h3 class="mt-5">Active agreements</h3>
@@ -27,6 +27,7 @@
     {% for node in fleet_nodes %}<tr><td>NODE-{{ '%04d'|format(node['listingid']) }}</td><td>{{ node['title'] }}</td><td>{{ (node['benchmark_score'] % 64) + 20 }}%</td><td>{{ (node['benchmark_score'] % 18) + 42 }} °C</td><td>99.9%</td><td>{% if node['status'] == 'available' %}<span class="badge text-bg-success">Healthy</span>{% else %}<span class="badge text-bg-warning">Busy</span>{% endif %}</td><td><button class="btn btn-sm btn-outline-danger" type="button">Reboot Node</button></td></tr>{% else %}<tr><td colspan="7"><div class="alert alert-info mb-0">No compute nodes are registered in your enterprise fleet yet.</div></td></tr>{% endfor %}
     </tbody></table></div>
 </section>
+<div class="modal fade" id="bulkAddModal" tabindex="-1" aria-labelledby="bulkAddTitle" aria-hidden="true"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h3 class="modal-title" id="bulkAddTitle">Bulk Add Nodes</h3><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><p>Paste a JSON array with <code>cpu</code>, <code>gpu</code>, <code>ram</code>, and <code>hourly_rate</code> for each node.</p><textarea id="bulk-node-json" class="form-control" rows="10"></textarea><div id="bulk-node-result" class="mt-3"></div></div><div class="modal-footer"><button type="button" class="btn btn-primary" id="bulk-add-submit">Provision Nodes</button></div></div></div></div>
 {% endblock %}
 {% block scripts %}
 <script>
@@ -34,10 +35,10 @@
     var earningsChart = new Chart(document.getElementById('earningsChart'), { type: 'line', data: { labels: [], datasets: [{ label: 'Earnings ($)', data: [], borderColor: '#6f42c1', backgroundColor: 'rgba(111, 66, 193, 0.16)', fill: true, tension: 0.4 }] }, options: chartOptions });
     var usageChart = new Chart(document.getElementById('usageChart'), { type: 'line', data: { labels: [], datasets: [{ label: 'Compute hours', data: [], borderColor: '#4338ca', backgroundColor: 'rgba(67, 56, 202, 0.14)', fill: true, tension: 0.4 }] }, options: chartOptions });
     function refreshDashboardCharts() {
-        fetch('/api/chart-data').then(function (response) { return response.json(); }).then(function (response) {
+        fetch('/api/enterprise/chart-data').then(function (response) { return response.json(); }).then(function (response) {
             if (response.status === 'error') return;
             earningsChart.data.labels = response.labels;
-            earningsChart.data.datasets[0].data = response.earnings;
+            earningsChart.data.datasets[0].data = response.revenue;
             earningsChart.update();
             usageChart.data.labels = response.labels;
             usageChart.data.datasets[0].data = response.usage;
@@ -75,5 +76,14 @@
     }
     updateCountdowns();
     setInterval(updateCountdowns, 1000);
+    document.getElementById('bulk-add-submit').addEventListener('click', function () {
+        var result = document.getElementById('bulk-node-result');
+        try {
+            var configurations = JSON.parse(document.getElementById('bulk-node-json').value);
+            fetch('/api/enterprise/bulk-add', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(configurations)})
+                .then(function (response) { return response.json(); })
+                .then(function (response) { if (response.status === 'success') window.location.reload(); else { result.className = 'alert alert-danger'; result.textContent = response.message; } });
+        } catch (error) { result.className = 'alert alert-danger'; result.textContent = 'Please provide a valid JSON array.'; }
+    });
 </script>
 {% endblock %}

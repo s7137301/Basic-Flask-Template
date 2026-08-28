@@ -176,6 +176,39 @@ def create_listing():
 
     return render_template('create_listing.html', hardware_rates=HARDWARE_RATES)
 
+@app.route('/api/enterprise/bulk-add', methods=['POST'])
+def enterprise_bulk_add():
+    if 'userid' not in session:
+        return jsonify({'status': 'error', 'message': 'Login required.'}), 401
+    enterprise_user = DATABASE.ViewQuery(
+        "SELECT is_enterprise, enterprise_status FROM users WHERE userid = ?",
+        (session['userid'],))
+    if not enterprise_user or enterprise_user[0].get('is_enterprise') != 1 or enterprise_user[0].get('enterprise_status') != 'approved':
+        return jsonify({'status': 'error', 'message': 'Approved enterprise account required.'}), 403
+    configurations = request.get_json(silent=True)
+    if not isinstance(configurations, list):
+        return jsonify({'status': 'error', 'message': 'Send a JSON array of machine configurations.'}), 400
+
+    added = 0
+    for configuration in configurations:
+        if not isinstance(configuration, dict):
+            continue
+        cpu = str(configuration.get('cpu', '')).strip()
+        gpu = str(configuration.get('gpu', '')).strip()
+        try:
+            ram_gb = int(configuration.get('ram', configuration.get('ram_gb')))
+            hourly_rate = float(configuration.get('hourly_rate', configuration.get('hourly_price')))
+        except (TypeError, ValueError):
+            continue
+        if not cpu or not gpu or ram_gb < 1 or hourly_rate < 0:
+            continue
+        title = gpu + ' + ' + cpu
+        if DATABASE.ModifyQuery(
+            "INSERT INTO listings (sellerid, title, hardware_type, ram_gb, hourly_price, status, enterprise_only, benchmark_score, allow_failover, absorb_failovers, queue_status) VALUES (?, ?, ?, ?, ?, 'available', 0, 100, 1, 1, 'active')",
+            (session['userid'], title, 'CPU + GPU', ram_gb, hourly_rate)):
+            added += 1
+    return jsonify({'status': 'success', 'nodes_added': added})
+
 @app.route('/admin/migrate-hardware')
 def migrate_hardware():
     if session.get('permission') != 'admin':
@@ -279,6 +312,8 @@ def home():
         return redirect('./')
 
     user = user[0]
+    if user.get('is_enterprise') == 1:
+        return redirect('/enterprise-dashboard')
     active_rentals = DATABASE.ViewQuery(
         "SELECT agreements.agreementid, agreements.hours, agreements.escrow_status, agreements.start_time, agreements.end_time, agreements.status, agreements.queue_status, listings.title FROM agreements JOIN listings ON agreements.listingid = listings.listingid WHERE agreements.buyerid = ? AND (agreements.status = 'active' OR agreements.queue_status = 'active')",
         (session['userid'],)) or []
@@ -327,6 +362,67 @@ def home():
     app.logger.info("Home")
     template = "enterprise_dashboard.html" if user.get('is_enterprise') == 1 else "home.html"
     return render_template(template, user=user, **dashboard)
+
+@app.route('/enterprise-dashboard')
+def enterprise_dashboard():
+    check_expired_rentals()
+    if 'userid' not in session:
+        return redirect('./')
+    users = DATABASE.ViewQuery("SELECT * FROM users WHERE userid = ?", (session['userid'],))
+    if not users:
+        session.clear()
+        return redirect('./')
+    user = users[0]
+    if user.get('is_enterprise') != 1 or user.get('enterprise_status') != 'approved':
+        return redirect('/home')
+    active_rentals = DATABASE.ViewQuery(
+        "SELECT agreements.*, listings.title FROM agreements JOIN listings ON agreements.listingid = listings.listingid WHERE agreements.buyerid = ? AND (agreements.status = 'active' OR agreements.queue_status = 'active')",
+        (session['userid'],)) or []
+    fleet_nodes = DATABASE.ViewQuery(
+        "SELECT listingid, title, hardware_type, status, benchmark_score FROM listings WHERE sellerid = ? ORDER BY listingid DESC",
+        (session['userid'],)) or []
+    fleet_size = DATABASE.ViewQuery("SELECT COUNT(*) AS total FROM listings WHERE sellerid = ?", (session['userid'],))
+    utilized_nodes = DATABASE.ViewQuery("""
+        SELECT COUNT(DISTINCT listings.listingid) AS total
+        FROM listings JOIN agreements ON agreements.listingid = listings.listingid
+        WHERE listings.sellerid = ? AND (agreements.status = 'active' OR agreements.queue_status = 'active')
+    """, (session['userid'],))
+    revenue = DATABASE.ViewQuery("""
+        SELECT COALESCE(SUM(agreements.total_cost), 0) AS total
+        FROM agreements JOIN listings ON agreements.listingid = listings.listingid
+        WHERE listings.sellerid = ? AND agreements.status = 'completed'
+    """, (session['userid'],))
+    total_fleet = fleet_size[0]['total'] if fleet_size else 0
+    active_fleet = utilized_nodes[0]['total'] if utilized_nodes else 0
+    return render_template('enterprise_dashboard.html', user=user, active_rentals=active_rentals,
+                           fleet_nodes=fleet_nodes, total_fleet_size=total_fleet,
+                           active_utilization=(active_fleet / total_fleet * 100) if total_fleet else 0,
+                           realtime_revenue=revenue[0]['total'] if revenue else 0,
+                           enterprise_pending=False, total_earnings=revenue[0]['total'] if revenue else 0,
+                           escrow_balance=0, reliability_score=100)
+
+@app.route('/api/enterprise/chart-data')
+def enterprise_chart_data():
+    if 'userid' not in session:
+        return jsonify({'status': 'error', 'message': 'Login required.'}), 401
+    user = DATABASE.ViewQuery("SELECT is_enterprise, enterprise_status FROM users WHERE userid = ?", (session['userid'],))
+    if not user or user[0].get('is_enterprise') != 1 or user[0].get('enterprise_status') != 'approved':
+        return jsonify({'status': 'error', 'message': 'Approved enterprise account required.'}), 403
+    labels = [(datetime.now() - timedelta(days=days)).strftime('%Y-%m-%d') for days in range(6, -1, -1)]
+    revenue_rows = DATABASE.ViewQuery("""
+        SELECT date(CASE WHEN agreements.created_at = '' THEN 'now' ELSE agreements.created_at END) AS day, COALESCE(SUM(agreements.total_cost), 0) AS value
+        FROM agreements JOIN listings ON agreements.listingid = listings.listingid
+        WHERE listings.sellerid = ? AND agreements.status = 'completed' AND day >= date('now', '-6 days') GROUP BY day
+    """, (session['userid'],)) or []
+    usage_rows = DATABASE.ViewQuery("""
+        SELECT date(CASE WHEN agreements.created_at = '' THEN 'now' ELSE agreements.created_at END) AS day, COALESCE(SUM(agreements.hours), 0) AS value
+        FROM agreements JOIN listings ON agreements.listingid = listings.listingid
+        WHERE listings.sellerid = ? AND day >= date('now', '-6 days') GROUP BY day
+    """, (session['userid'],)) or []
+    revenue_by_day = {row['day']: float(row['value'] or 0) for row in revenue_rows}
+    usage_by_day = {row['day']: float(row['value'] or 0) for row in usage_rows}
+    return jsonify({'labels': labels, 'revenue': [revenue_by_day.get(day, 0) for day in labels],
+                    'usage': [usage_by_day.get(day, 0) for day in labels]})
 
 @app.route('/dashboard')
 def dashboard():
