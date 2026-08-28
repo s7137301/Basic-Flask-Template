@@ -1,8 +1,8 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="container mt-5">
-    <h1>Contact Us</h1>
-    <p>Our support team can help with account access, listing questions, rental agreements, and platform operations.</p>
-    <p>When contacting us, include your account email and any relevant listing or agreement identifier so we can respond efficiently.</p>
+    <p class="text-uppercase text-muted">Talk to Potato</p><h1>Contact Us</h1>
+    <p class="lead">Our support team can help with account access, listing questions, rental agreements, platform operations, and partnership enquiries.</p>
+    <div class="row g-5 mb-5"><div class="col-lg-5"><h2>Before you write</h2><p>Include your account email and any relevant listing or agreement identifier. Never include a password, session token, API key, or other secret in a support request.</p><p>For urgent service concerns, describe what happened, when it happened, and whether a workload or payment is currently affected.</p></div><div class="col-lg-7"><form class="card p-4"><div class="mb-3"><label class="form-label" for="contact-name">Name</label><input class="form-control" id="contact-name" type="text" required></div><div class="mb-3"><label class="form-label" for="contact-email">Email</label><input class="form-control" id="contact-email" type="email" required></div><div class="mb-3"><label class="form-label" for="contact-topic">Topic</label><select class="form-select" id="contact-topic"><option>Account support</option><option>Rental agreement</option><option>Listing support</option><option>Partnerships</option></select></div><div class="mb-3"><label class="form-label" for="contact-message">Message</label><textarea class="form-control" id="contact-message" rows="5" required></textarea></div><button class="btn btn-primary" type="button">Send message</button></form></div></div>
 </div>
 {% endblock %}

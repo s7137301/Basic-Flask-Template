@@ -1,8 +1,14 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="container mt-5">
-    <h1>Help Center</h1>
-    <p>Find guidance for listing hardware, renting compute, managing agreements, and understanding escrow and platform fees.</p>
-    <p>For account or service issues, review your dashboard first and contact our support team with the relevant agreement or listing number.</p>
+    <p class="text-uppercase text-muted">Support and guidance</p><h1>Potato Help Center</h1>
+    <p class="lead">Find clear answers about compute listings, rental queues, priority jobs, escrow, failover, and account security.</p>
+    <div class="accordion mt-4 mb-5" id="helpAccordion">
+        <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#helpOne">How does a compute rental work?</button></h2><div id="helpOne" class="accordion-collapse collapse show" data-bs-parent="#helpAccordion"><div class="accordion-body">Choose a listing, select the number of hours, review the seller payout and platform fee, then confirm the agreement. The buyer payment is recorded as held in escrow while the contract is active.</div></div></div>
+        <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#helpTwo">What happens when a machine is busy?</button></h2><div id="helpTwo" class="accordion-collapse collapse" data-bs-parent="#helpAccordion"><div class="accordion-body">You can join the standard queue, or choose Priority Compute when available. Priority jobs are activated immediately and use the premium pricing shown at checkout.</div></div></div>
+        <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#helpThree">How does SLA failover work?</button></h2><div id="helpThree" class="accordion-collapse collapse" data-bs-parent="#helpAccordion"><div class="accordion-body">When failover is available and a node disconnects, completed hours are accounted for and remaining work may move to an eligible backup node. The agreement records the offload and any platform penalty.</div></div></div>
+        <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#helpFour">How can sellers improve their listing?</button></h2><div id="helpFour" class="accordion-collapse collapse" data-bs-parent="#helpAccordion"><div class="accordion-body">Use accurate CPU and GPU names, provide a realistic hourly rate, keep benchmark information current, and maintain the node during booked hours.</div></div></div>
+    </div>
+    <h2>Still need help?</h2><p>Include your account email, listing identifier, agreement number, and a concise description of the issue when contacting Potato support.</p>
 </div>
 {% endblock %}

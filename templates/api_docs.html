@@ -12,7 +12,7 @@
     <main class="col-md-9">
         <section id="introduction" class="api-section">
             <p class="text-uppercase text-muted">Developer reference</p>
-            <h1>ComputeMarket API</h1>
+            <h1>Potato API</h1>
             <p class="lead">Programmatically discover compute capacity and submit reliable rental jobs through a predictable REST interface.</p>
         </section>
         <section id="authentication" class="api-section">
@@ -25,7 +25,7 @@
             <h2>Endpoints</h2>
             <h3><span class="method-badge method-get">GET</span> /api/v1/hardware/available</h3>
             <p>Returns available GPU and CPU listings with pricing, queue state, and hardware specifications.</p>
-            <pre><code>curl https://api.computemarket.example/api/v1/hardware/available \
+            <pre><code>curl https://api.potato.example/api/v1/hardware/available \
   -H "Authorization: Bearer cm_live_your_token_here"</code></pre>
             <pre><code>{
   "data": [
@@ -45,7 +45,7 @@
             <pre><code>import requests
 
 response = requests.post(
-    "https://api.computemarket.example/api/v1/rentals/priority",
+    "https://api.potato.example/api/v1/rentals/priority",
     headers={"Authorization": "Bearer cm_live_your_token_here"},
     json={"listing_id": 42, "hours": 6}
 )
