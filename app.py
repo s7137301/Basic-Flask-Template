@@ -260,7 +260,7 @@ def home():
 
     user = user[0]
     active_rentals = DATABASE.ViewQuery(
-        "SELECT agreements.agreementid, agreements.hours, agreements.escrow_status, agreements.start_time, agreements.end_time, listings.title FROM agreements JOIN listings ON agreements.listingid = listings.listingid WHERE agreements.buyerid = ? AND agreements.status = 'active'",
+        "SELECT agreements.agreementid, agreements.hours, agreements.escrow_status, agreements.start_time, agreements.end_time, agreements.status, agreements.queue_status, listings.title FROM agreements JOIN listings ON agreements.listingid = listings.listingid WHERE agreements.buyerid = ? AND (agreements.status = 'active' OR agreements.queue_status = 'active')",
         (session['userid'],)) or []
     listings_count = DATABASE.ViewQuery(
         "SELECT COUNT(*) AS total FROM listings WHERE sellerid = ?", (session['userid'],))
@@ -413,10 +413,16 @@ def checkout(listing_id):
 
 def check_expired_rentals():
     expired_agreements = DATABASE.ViewQuery(
-        "SELECT agreementid FROM agreements WHERE status = 'active' AND end_time IS NOT NULL AND end_time <= ?",
-        (datetime.now().strftime('%Y-%m-%d %H:%M:%S'),)) or []
+        "SELECT agreementid, end_time FROM agreements WHERE status = 'active' AND end_time IS NOT NULL"
+    ) or []
+    now = datetime.now()
     for agreement in expired_agreements:
-        DATABASE.ModifyQuery("UPDATE agreements SET status = 'completed' WHERE agreementid = ?", (agreement['agreementid'],))
+        try:
+            end_time = datetime.strptime(agreement['end_time'], '%Y-%m-%d %H:%M:%S')
+        except (TypeError, ValueError):
+            continue
+        if end_time <= now:
+            DATABASE.ModifyQuery("UPDATE agreements SET status = 'completed' WHERE agreementid = ?", (agreement['agreementid'],))
 
 @app.route('/api/run-task', methods=['POST'])
 def run_task():
