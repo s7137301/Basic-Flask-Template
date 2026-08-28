@@ -99,7 +99,18 @@
 .activity-active { background: #fff3cd; color: #856404; }
 .activity-complete { background: #d1e7dd; color: #0f5132; }
 .activity-refunded { background: #f8d7da; color: #842029; }
+.api-sidebar { position: sticky; top: 1.5rem; }
+.api-sidebar a { border-left: 2px solid #e5e7eb; color: #6b7280; display: block; padding: 0.55rem 0.9rem; text-decoration: none; }
+.api-sidebar a:hover { border-left-color: #6f42c1; color: #6f42c1; }
+.api-section { margin-bottom: 4rem; scroll-margin-top: 2rem; }
+.api-section h2 { border-bottom: 1px solid #e5e7eb; margin-bottom: 1.25rem; padding-bottom: 0.65rem; }
+.api-section pre { background: #17152a; border-radius: 0.45rem; color: #e5e7eb; overflow-x: auto; padding: 1rem; }
+.api-section code { color: inherit; }
+.method-badge { border-radius: 0.3rem; color: #fff; display: inline-block; font-size: 0.75rem; margin-right: 0.5rem; padding: 0.3rem 0.45rem; vertical-align: middle; }
+.method-get { background: #198754; }
+.method-post { background: #6f42c1; }
 @media (max-width: 768px) {
     .responsive-table table { min-width: 620px; }
     .filter-panel { position: static; }
+    .api-sidebar { position: static; }
 }

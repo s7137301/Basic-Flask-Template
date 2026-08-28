@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row g-5 mt-4 api-docs">
+    <aside class="col-md-3">
+        <nav class="api-sidebar" aria-label="API documentation navigation">
+            <a href="#introduction">Introduction</a>
+            <a href="#authentication">Authentication</a>
+            <a href="#endpoints">Endpoints</a>
+            <a href="#rate-limits">Rate Limits</a>
+        </nav>
+    </aside>
+    <main class="col-md-9">
+        <section id="introduction" class="api-section">
+            <p class="text-uppercase text-muted">Developer reference</p>
+            <h1>ComputeMarket API</h1>
+            <p class="lead">Programmatically discover compute capacity and submit reliable rental jobs through a predictable REST interface.</p>
+        </section>
+        <section id="authentication" class="api-section">
+            <h2>Authentication</h2>
+            <p>Send your API credential with every request in the Authorization header as a Bearer Token.</p>
+            <pre><code>Authorization: Bearer cm_live_your_token_here</code></pre>
+            <p>Keep tokens private, rotate them regularly, and never expose them in browser-side code or public repositories.</p>
+        </section>
+        <section id="endpoints" class="api-section">
+            <h2>Endpoints</h2>
+            <h3><span class="method-badge method-get">GET</span> /api/v1/hardware/available</h3>
+            <p>Returns available GPU and CPU listings with pricing, queue state, and hardware specifications.</p>
+            <pre><code>curl https://api.computemarket.example/api/v1/hardware/available \
+  -H "Authorization: Bearer cm_live_your_token_here"</code></pre>
+            <pre><code>{
+  "data": [
+    {
+      "listing_id": 42,
+      "hardware": "NVIDIA RTX 4090 + AMD Ryzen 9 7950X",
+      "hardware_type": "CPU + GPU",
+      "ram_gb": 64,
+      "hourly_price": 1.10,
+      "queue_status": "active",
+      "specs": {"benchmark_score": 9450, "availability": "available"}
+    }
+  ]
+}</code></pre>
+            <h3><span class="method-badge method-post">POST</span> /api/v1/rentals/priority</h3>
+            <p>Submits a priority compute job. Priority jobs bypass standard queues and are charged at four times the base compute cost.</p>
+            <pre><code>import requests
+
+response = requests.post(
+    "https://api.computemarket.example/api/v1/rentals/priority",
+    headers={"Authorization": "Bearer cm_live_your_token_here"},
+    json={"listing_id": 42, "hours": 6}
+)
+print(response.json())</code></pre>
+            <pre><code>{
+  "status": "accepted",
+  "agreement_id": 108,
+  "queue_status": "active",
+  "is_priority": 1,
+  "total_cost": 26.40,
+  "escrow_status": "held"
+}</code></pre>
+        </section>
+        <section id="rate-limits" class="api-section">
+            <h2>Rate Limits</h2>
+            <p>Requests are limited to 60 requests per minute per token. Responses include standard rate-limit headers so clients can back off gracefully.</p>
+            <pre><code>X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 58
+X-RateLimit-Reset: 1710000000</code></pre>
+        </section>
+    </main>
+</div>
+{% endblock %}

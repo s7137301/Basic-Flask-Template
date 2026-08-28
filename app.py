@@ -612,6 +612,30 @@ def terms():
 def privacy():
     return render_template('privacy.html')
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/careers')
+def careers():
+    return render_template('careers.html')
+
+@app.route('/partnerships')
+def partnerships():
+    return render_template('partnerships.html')
+
+@app.route('/help')
+def help_center():
+    return render_template('help.html')
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
+@app.route('/api-docs')
+def api_docs():
+    return render_template('api_docs.html')
+
 @app.route('/platform-agreement')
 def platform_agreement():
     return render_template('platform_agreement.html')

@@ -1329,3 +1329,48 @@ INFO:werkzeug: * Debugger PIN: 593-560-539
 INFO:app:Login
 INFO:app:Home
 INFO:app:Admin
+INFO:werkzeug: * Detected change in "c:\\Users\\S7137301\\OneDrive - St Joseph's College, Gregory Terrace\\2026\\Digital Solutions\\Term 3\\Basic-Flask-Template\\app.py", reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 593-560-539
+INFO:app:Log out
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:12:04] "[32mGET /logout HTTP/1.1[0m" 302 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:12:04] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:12:04] "GET /static/css/custom.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:12:05] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:12:13] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:12:13] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:12:13] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:12:23] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:12:23] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:12:23] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:12:27] "GET /platform-agreement HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:12:27] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:12:27] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:12:29] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:12:29] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:12:30] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:app:Register
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:13:38] "GET /register HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:13:38] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:13:38] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:13:47] "GET /platform-agreement HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:13:47] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:13:47] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:13:50] "[32mGET /products HTTP/1.1[0m" 302 -
+INFO:app:Login
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:13:50] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:13:50] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [28/Aug/2026 13:13:51] "[36mGET /static/js/new_ajax_helper.js HTTP/1.1[0m" 304 -
+INFO:werkzeug: * Detected change in "c:\\Users\\S7137301\\OneDrive - St Joseph's College, Gregory Terrace\\2026\\Digital Solutions\\Term 3\\Basic-Flask-Template\\app.py", reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 593-560-539
+INFO:werkzeug: * Detected change in "c:\\Users\\S7137301\\OneDrive - St Joseph's College, Gregory Terrace\\2026\\Digital Solutions\\Term 3\\Basic-Flask-Template\\app.py", reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 593-560-539
